@@ -91,91 +91,10 @@ else {
 ?>
 
 	<td colspan="<?php echo $first_column_colspan; ?>">
+		<input type="hidden" name="prod_entry_mode" value="free" id="prod_entry_mode_free" />
+		<input type="hidden" name="type" value="1" id="select_type" class="flat" />
 
 	<?php
-
-	// Free line
-	echo '<span>';
-	// Show radio free line
-	if (! empty($conf->product->enabled) || ! empty($conf->service->enabled))
-	{
-		echo '<input type="radio" name="prod_entry_mode" id="prod_entry_mode_free" value="free"';
-		//echo (GETPOST('prod_entry_mode')=='free' ? ' checked="true"' : ((empty($forceall) && (empty($conf->product->enabled) || empty($conf->service->enabled)))?' checked="true"':'') );
-		echo (GETPOST('prod_entry_mode')=='free' ? ' checked="true"' : '');
-		echo '> ';
-	}
-	else echo '<input type="hidden" id="prod_entry_mode_free" name="prod_entry_mode" value="free">';
-	// Show type selector
-/*	if (empty($conf->product->enabled) && empty($conf->service->enabled))
-	{
-		// If module product and service disabled, by default this is a product except for contracts it is a service
-		print '<input type="hidden" name="type" value="'.((! empty($object->element) && $object->element == 'contrat')?'1':'0').'">';
-	}
-	else {*/
-		echo $langs->trans("FreeLineOfType");
-		/*
-		if (empty($conf->product->enabled) && empty($conf->service->enabled)) echo $langs->trans("Type");
-		else if (! empty($forceall) || (! empty($conf->product->enabled) && ! empty($conf->service->enabled))) echo $langs->trans("FreeLineOfType");
-		else if (empty($conf->product->enabled) && ! empty($conf->service->enabled)) echo $langs->trans("FreeLineOfType").' '.$langs->trans("Service");
-		else if (! empty($conf->product->enabled) && empty($conf->service->enabled)) echo $langs->trans("FreeLineOfType").' '.$langs->trans("Product");*/
-		echo ' ';
-		echo $form->select_type_of_lines(isset($_POST["type"])?$_POST["type"]:-1,'type',1,1,1);
-//	}
-	echo '</span>';
-
-	// Predefined product/service
-	if (! empty($conf->product->enabled) || ! empty($conf->service->enabled))
-	{
-		echo '<br><span>';
-		echo '<input type="radio" name="prod_entry_mode" id="prod_entry_mode_predef" value="predef"'.(GETPOST('prod_entry_mode')=='predef'?' checked="true"':'').'> ';
-
-		if (empty($senderissupplier))
-		{
-			if (! empty($conf->product->enabled) && empty($conf->service->enabled)) echo $langs->trans('PredefinedProductsToSell');
-			else if (empty($conf->product->enabled) && ! empty($conf->service->enabled)) echo $langs->trans('PredefinedServicesToSell');
-			else echo $langs->trans('PredefinedProductsAndServicesToSell');
-		}
-		else
-		{
-			if (! empty($conf->product->enabled) && empty($conf->service->enabled)) echo $langs->trans('PredefinedProductsToPurchase');
-			else if (empty($conf->product->enabled) && ! empty($conf->service->enabled)) echo $langs->trans('PredefinedServicesToPurchase');
-			else echo $langs->trans('PredefinedProductsAndServicesToPurchase');
-		}
-		echo ' ';
-
-		$filtertype='';
-		if (! empty($object->element) && $object->element == 'contrat' && empty($conf->global->CONTRACT_SUPPORT_PRODUCTS)) $filtertype='1';
-
-		if (empty($senderissupplier))
-		{
-			$form->select_produits('', 'idprod', $filtertype, $conf->product->limit_size, $buyer->price_level, 1, 2, '', 1, array(),$buyer->id);
-		}
-		else
-		{
-			$ajaxoptions=array(
-					'update' => array('qty'=>'qty','remise_percent' => 'discount'),	// html id tag will be edited with which ajax json response key
-					'option_disabled' => 'addPredefinedProductButton',	// html id to disable once select is done
-					'warning' => $langs->trans("NoPriceDefinedForThisSupplier") // translation of an error saved into var 'error'
-			);
-			$form->select_produits_fournisseurs($object->fourn_id, GETPOST('idprodfournprice'), 'idprodfournprice', '', '', $ajaxoptions, 1);
-		}
-		echo '</span>';
-	}
-
-	if (is_object($hookmanager) && empty($senderissupplier))
-	{
-        $parameters=array('fk_parent_line'=>GETPOST('fk_parent_line','int'));
-		$reshook=$hookmanager->executeHooks('formCreateProductOptions',$parameters,$object,$action);
-	}
-	if (is_object($hookmanager) && ! empty($senderissupplier))
-	{
-		$parameters=array('htmlname'=>'addproduct');
-		$reshook=$hookmanager->executeHooks('formCreateProductSupplierOptions',$parameters,$object,$action);
-	}
-
-
-	if (! empty($conf->product->enabled) || ! empty($conf->service->enabled)) echo '<br>';
-
 	// Editor wysiwyg
 	require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 	$nbrows=ROWS_2;
