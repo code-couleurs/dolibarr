@@ -28,12 +28,14 @@
 $usemargins=0;
 if (! empty($conf->margin->enabled) && ! empty($object->element) && in_array($object->element,array('facture','propal','commande'))) $usemargins=1;
 
+$multidelete_column_colspan = ($user->rights->{$object->element}->supprimer AND $object->statut == 0);
+$first_column_colspan = 3 + (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) + $multidelete_column_colspan;
 ?>
 
 <!-- BEGIN PHP TEMPLATE predefinedproductline_create.tpl.php -->
 
 <tr class="liste_titre nodrag nodrop">
-	<td<?php echo (! empty($conf->global->MAIN_VIEW_LINE_NUMBER) ? ' colspan="4"' : ' colspan="3"'); ?>>
+	<td colspan="<?php echo $first_column_colspan; ?>">
 	<?php
 	echo '<span class="hideonsmartphone">'.$langs->trans("AddNewLine").' - </span>';
 	if (! empty($conf->product->enabled) && empty($conf->service->enabled)) echo $langs->trans('RecordedProducts');
@@ -86,7 +88,7 @@ else {
 	$coldisplay=3; }
 ?>
 
-	<td<?php echo (! empty($conf->global->MAIN_VIEW_LINE_NUMBER) ? ' colspan="4"' : ' colspan="3"'); ?>>
+	<td colspan="<?php echo $first_column_colspan; ?>">
 
 	<script type="text/javascript">
 	jQuery(document).ready(function() {
@@ -199,7 +201,7 @@ if (! empty($conf->service->enabled) && $dateSelector)
 ?>
 
 <tr <?php echo $bcnd[$var]; ?>>
-	<td colspan="<?php echo $colspan; ?>">
+	<td colspan="<?php echo $colspan + $multidelete_column_colspan; ?>">
 	<?php
 	if (! empty($object->element) && $object->element == 'contrat')
 	{
@@ -210,7 +212,7 @@ if (! empty($conf->service->enabled) && $dateSelector)
 	}
 	else
 	{
-		echo $langs->trans('ServiceLimitedDuration').' '.$langs->trans('From').' ';
+		echo $langs->trans('CC_ServiceLimitedDuration').' '.$langs->trans('From').' ';
 		echo $form->select_date('','date_start_predef',empty($conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE)?0:1,empty($conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE)?0:1,1,"addpredefinedproduct");
 		echo ' '.$langs->trans('to').' ';
 		echo $form->select_date('','date_end_predef',empty($conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE)?0:1,empty($conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE)?0:1,1,"addpredefinedproduct");

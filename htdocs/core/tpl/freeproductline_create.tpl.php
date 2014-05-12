@@ -28,12 +28,14 @@
 $usemargins=0;
 if (! empty($conf->margin->enabled) && ! empty($object->element) && in_array($object->element,array('facture','propal','commande'))) $usemargins=1;
 
+$multidelete_column_colspan = ($user->rights->{$object->element}->supprimer AND $object->statut == 0);
+$first_column_colspan = 1 + (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) + $multidelete_column_colspan;
 ?>
 
 <!-- BEGIN PHP TEMPLATE freeproductline_create.tpl.php -->
 
 <tr class="liste_titre nodrag nodrop">
-	<td<?php echo (! empty($conf->global->MAIN_VIEW_LINE_NUMBER) ? ' colspan="2"' : ''); ?>>
+	<td colspan="<?php echo $first_column_colspan; ?>">
 	<div id="add"></div>
 	<span class="hideonsmartphone"><?php echo $langs->trans('AddNewLine').' - ' ?></span><?php echo $langs->trans("FreeZone"); ?>
 	</td>
@@ -84,21 +86,11 @@ else {
 	$coldisplay=0; }
 ?>
 
-	<td<?php echo (! empty($conf->global->MAIN_VIEW_LINE_NUMBER) ? ' colspan="2"' : ''); ?>>
+	<td colspan="<?php echo $first_column_colspan; ?>">
+		<!-- It is a service for Code Couleurs -->
+		<input type="hidden" name="type" id="select_type" value="1"/>
+		
 	<?php
-
-	echo '<span>';
-	echo $form->select_type_of_lines(isset($_POST["type"])?$_POST["type"]:-1,'type',1);
-	echo '</span>';
-
-	if (is_object($hookmanager))
-	{
-        $parameters=array('fk_parent_line'=>GETPOST('fk_parent_line','int'));
-		$reshook=$hookmanager->executeHooks('formCreateProductOptions',$parameters,$object,$action);
-	}
-
-	if ((! empty($conf->product->enabled) && ! empty($conf->service->enabled)) || (empty($conf->product->enabled) && empty($conf->service->enabled))) echo '<br>';
-
 	// Editor wysiwyg
 	require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 	$nbrows=ROWS_2;
@@ -192,7 +184,7 @@ if (! empty($conf->service->enabled) && $dateSelector)
 ?>
 
 <tr <?php echo $bcnd[$var]; ?>>
-	<td colspan="<?php echo $colspan; ?>">
+	<td colspan="<?php echo $colspan + $multidelete_column_colspan; ?>">
 	<?php
 	if (! empty($object->element) && $object->element == 'contrat')
 	{
@@ -203,7 +195,7 @@ if (! empty($conf->service->enabled) && $dateSelector)
 	}
 	else
 	{
-		echo $langs->trans('ServiceLimitedDuration').' '.$langs->trans('From').' ';
+		echo $langs->trans('CC_ServiceLimitedDuration').' '.$langs->trans('From').' ';
 		echo $form->select_date('','date_start',empty($conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE)?0:1,empty($conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE)?0:1,1,"addproduct");
 		echo ' '.$langs->trans('to').' ';
 		echo $form->select_date('','date_end',empty($conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE)?0:1,empty($conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE)?0:1,1,"addproduct");

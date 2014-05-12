@@ -31,8 +31,25 @@
 
 <?php
 $coldisplay=-1; // We remove first td
+
+// Checked checkboxes
+if (isset($_POST['multiple_delete_lines'])) {
+	$checked_cbs = $_POST['multiple_delete_lines'];
+}
+elseif (isset($_GET['line_ids'])) {
+	$checked_cbs = explode(',', $_GET['line_ids']);
+}
+else {
+	$checked_cbs = array();
+}
+
 ?>
 <tr <?php echo $bc[$var]; ?>>
+	<?php if ($user->rights->$element->supprimer AND $this->statut == 0): ?>
+	<td width="10" align="center">
+		<input type="checkbox" name="multiple_delete_lines[]" value="<?php echo $line->id; ?>" <?php if (in_array($line->id, $checked_cbs)): ?>checked="checked"<?php endif; ?>/>
+	</td>
+	<?php endif; ?>
 	<td<?php echo (! empty($conf->global->MAIN_VIEW_LINE_NUMBER) ? ' colspan="2"' : ''); ?>><?php $coldisplay+=(! empty($conf->global->MAIN_VIEW_LINE_NUMBER))?2:1; ?>
 	<div id="line_<?php echo $line->id; ?>"></div>
 
@@ -171,7 +188,7 @@ $coldisplay=-1; // We remove first td
 
 <?php if (! empty($conf->service->enabled) && $line->product_type == 1 && $dateSelector)	 { ?>
 <tr id="service_duration_area" <?php echo $bc[$var]; ?>>
-	<td colspan="11"><?php echo $langs->trans('ServiceLimitedDuration').' '.$langs->trans('From').' '; ?>
+	<td colspan="11"><?php echo $langs->trans('CC_ServiceLimitedDuration').' '.$langs->trans('From').' '; ?>
 	<?php
 	$hourmin=(isset($conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE)?$conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE:'');
 	echo $form->select_date($line->date_start,'date_start',$hourmin,$hourmin,$line->date_start?0:1,"updateligne");

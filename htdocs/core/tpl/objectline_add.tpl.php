@@ -24,11 +24,14 @@
  * $this (invoice, order, ...)
  * $line defined
  */
+
+$multidelete_column_colspan = ($user->rights->{$object->element}->supprimer AND $object->statut == 0);
+$first_column_colspan = 1 + (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) + $multidelete_column_colspan;
 ?>
 
 <!-- BEGIN PHP TEMPLATE objectline_add.tpl.php -->
 <tr class="liste_titre nodrag nodrop">
-	<td<?php echo (! empty($conf->global->MAIN_VIEW_LINE_NUMBER) ? ' colspan="2"' : ''); ?>><div id="add"></div><?php echo $langs->trans('AddNewLine'); ?></td>
+	<td colspan="<?php echo $first_column_colspan; ?>"><div id="add"></div><?php echo $langs->trans('AddNewLine'); ?></td>
 	<td align="right" width="50"><?php echo $langs->trans('VAT'); ?></td>
 	<td align="right" width="80"><?php echo $langs->trans('PriceUHT'); ?></td>
 	<td align="right" width="80"><?php echo $langs->trans('PriceUTTC'); ?></td>
@@ -123,7 +126,7 @@ if (! empty($conf->margin->enabled)) {
 <?php } ?>
 
 <tr <?php echo $bcnd[$var]; ?>>
-	<td colspan="<?php echo $colspan2; ?>">
+	<td colspan="<?php echo $colspan2 + $multidelete_column_colspan; ?>">
 	<?php echo $form->select_type_of_lines((GETPOST('type')?GETPOST('type'):-1), 'type', 1); ?>
 
 	<span id="product_ref_area" class="hideobject">
@@ -148,7 +151,7 @@ if (! empty($conf->margin->enabled)) {
 </td>
 
 <tr <?php echo $bcnd[$var]; ?>>
-	<td<?php echo (! empty($conf->global->MAIN_VIEW_LINE_NUMBER) ? ' colspan="2"' : ''); ?>>
+	<td colspan="<?php echo $first_column_colspan; ?>">
 
 <?php
 	// Editor wysiwyg
@@ -219,10 +222,10 @@ else
 
 ?>
 <tr id="service_duration_area" <?php echo $bcnd[$var]; ?>>
-	<td colspan="<?php echo $colspan; ?>">
+	<td colspan="<?php echo $colspan + $multidelete_column_colspan; ?>">
 	<?php
 	$hourmin=(isset($conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE)?$conf->global->MAIN_USE_HOURMIN_IN_DATE_RANGE:'');
-	echo $langs->trans('ServiceLimitedDuration').' '.$langs->trans('From').' ';
+	echo $langs->trans('CC_ServiceLimitedDuration').' '.$langs->trans('From').' ';
 	echo $form->select_date('','date_start',$hourmin,$hourmin,1,"addproduct");
 	echo ' '.$langs->trans('to').' ';
 	echo $form->select_date('','date_end',$hourmin,$hourmin,1,"addproduct");
