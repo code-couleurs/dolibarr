@@ -82,6 +82,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 	);
 	
 	var $ONE_MORE_LINE = 5;
+	var $FIRST_AFTER_HEADER = 48;
 
 	/**
 	 *	Constructor
@@ -307,7 +308,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 					// On rajoute $tab_header_height à la topMargin pour éviter d'écrire quoi que ce soit dans le header récapitulatif.
 					$pdf->setTopMargin($tab_top_newpage + $tab_header_height);
-					$pdf->setPageOrientation('', 1, $heightforfooter+$heightforfreetext+$heightforinfotot);	// The only function to edit the bottom margin of current page to set it.
+					$pdf->setPageOrientation('', 1, $heightforfooter);	// The only function to edit the bottom margin of current page to set it.
 					$pageposbefore=$pdf->getPage();
 
 					// Description of product line
@@ -321,7 +322,6 @@ class pdf_codecouleurs extends ModelePDFPropales
 					if ($pageposafter > $pageposbefore)	// There is a pagebreak
 					{
 						$pdf->rollbackTransaction(true);
-						
 						// La page est finie, on trace le cadre du tableau sur toute la page.
 						$draw_tab_top = ($pagenb > 1) ? $tab_top_newpage : $tab_top;
 						$this->_draw_tableau_border($pdf, $draw_tab_top, $this->page_hauteur - $heightforfooter - $draw_tab_top -1);
@@ -332,25 +332,6 @@ class pdf_codecouleurs extends ModelePDFPropales
 						pdf_writelinedesc($pdf,$object,$i,$outputlangs,$this->posxtva-$curX,4,$curX,$curY,$hideref,$hidedesc,0,$hookmanager);
 						$pageposafter=$pdf->getPage();
 						$posyafter=$pdf->GetY();
-						if ($posyafter > ($this->page_hauteur - ($heightforfooter+$heightforfreetext+$heightforinfotot)))	// There is no space left for total+free text
-						{
-							if ($i == ($nblignes-1))	// No more lines, and no space left to show total, so we create a new page
-							{
-								$pdf->AddPage('','',true);
-								if (!empty($tplidx)) {
-									$pdf->useTemplate($tplidx);
-								}
-								if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) {
-									$this->_pagehead($pdf, $object, 0, $outputlangs, $hookmanager);
-								}
-								$pdf->setPage($pagenb+1);
-							}
-						}
-						else
-						{
-							// We found a page break
-							$showpricebeforepagebreak=0;
-						}
 					}
 					else	// No pagebreak
 					{
@@ -412,7 +393,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 					$this->localtax2[$localtax2rate]+=$localtax2ligne;
 
 					// We suppose that a too long description is moved completely on next page
-					if ($pageposafter > $pageposbefore && empty($showpricebeforepagebreak)) {
+					if ($pageposafter > $pageposbefore) {
 						$pdf->setPage($pageposafter);
 						$curY = $tab_top_newpage + $tab_header_height;
 					}
@@ -434,7 +415,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 					$nexY+=2;    // Passe espace entre les lignes
 
-					$current_tab_height += ($nexY - $old_nexY);
+					$current_tab_height += ($nexY - $curY);
 					// Detect if some page were added automatically and output _tableau for past pages
 					while ($pagenb < $pageposafter)
 					{
@@ -496,13 +477,13 @@ class pdf_codecouleurs extends ModelePDFPropales
 						$this->_pagehead($pdf, $object, 0, $outputlangs, $hookmanager);
 					}
 					$pdf->setPage($pagenb+1);
-					$bottomlasttab = $draw_tab_top;	// Haut de la page en +
+					$bottomlasttab = $this->FIRST_AFTER_HEADER;	// Haut de la page en +
 				}
 				else {
 					// On écrit en bas de la page, quitte à rogner sur l'espace minimal.
 					$bottomlasttab = min($end_tab_y + $space_tab_tot, $bottom_max);
 				}
-
+				
 				// Affiche zone infos
 				$posy=$this->_tableau_info($pdf, $object, $bottomlasttab, $outputlangs);
 
@@ -1057,7 +1038,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 		if ($showaddress)
 		{
-			$address_boxes_posy = 48;
+			$address_boxes_posy = $this->FIRST_AFTER_HEADER;
 			// Sender properties
 			$carac_emetteur='';
 			// Add internal contact of proposal if defined
