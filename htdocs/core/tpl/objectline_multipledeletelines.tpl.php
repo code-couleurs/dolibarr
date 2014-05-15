@@ -65,20 +65,7 @@ $langs->load("cc_extras");
 		});
 		
 		//* Check / uncheck #multiple_delete_select_all if all the checkboxes are checked or not
-		$("input[name='multiple_delete_lines[]']").change(function () {
-			var nb_checked = $("input[name='multiple_delete_lines[]']:checked").length;
-			
-			if (nb_checked === 0) {
-				// Aucune case cochée, on màj #multiple_delete_select_all pour pouvoir tout cocher.
-				$('#multiple_delete_select_all').attr('checked', false);
-				set_multiple_delete_select_all_label('<?php echo $langs->trans('CheckAll') ?>');
-			}
-			else if ($("#tablelines tbody tr[id^='row-']").length === nb_checked) {
-				// Toutes les cases sont cochées, on màj #multiple_delete_select_all pour pouvoir tout décocher.
-				$('#multiple_delete_select_all').attr('checked', 'checked');
-				set_multiple_delete_select_all_label('<?php echo $langs->trans('UncheckAll') ?>');
-			}
-		});
+		$("input[name='multiple_delete_lines[]']").change(update_multiple_delete_lines);
 		
 		// Ask to delete (and then delete if it's OK) !
 		$('#multiple_deleteline_submit').click(function () {
@@ -90,6 +77,20 @@ $langs->load("cc_extras");
 		function set_multiple_delete_select_all_label(newLabel) {
 			$("#multiple_delete_select_all").attr('title', newLabel);
 			$("label[for='multiple_delete_select_all']").html(newLabel);
+		}
+		
+		function update_multiple_delete_lines() {
+			var nb_checked = $("input[name='multiple_delete_lines[]']:checked").length;
+			if (nb_checked === 0) {
+				// Aucune case cochée, on màj #multiple_delete_select_all pour pouvoir tout cocher.
+				$('#multiple_delete_select_all').attr('checked', false);
+				set_multiple_delete_select_all_label('<?php echo $langs->trans('CheckAll') ?>');
+			}
+			else if ($("#tablelines tbody tr[id^='row-']").length === nb_checked) {
+				// Toutes les cases sont cochées, on màj #multiple_delete_select_all pour pouvoir tout décocher.
+				$('#multiple_delete_select_all').attr('checked', 'checked');
+				set_multiple_delete_select_all_label('<?php echo $langs->trans('UncheckAll') ?>');
+			}
 		}
 	});
 </script>
