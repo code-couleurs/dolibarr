@@ -339,7 +339,6 @@ class pdf_codecouleurs extends ModelePDFPropales
 					}
 
 					$nexY = $pdf->GetY();
-					$old_nexY = $nexY;
 					$pageposafter=$pdf->getPage();
 					$pdf->setPage($pageposbefore);
 					$pdf->setTopMargin($this->marge_haute);
@@ -465,7 +464,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				// Placement pour les infos suivantes
 				$end_tab_y = $current_tab_height + $draw_tab_top;
 				$space_tab_tot = 10;
-				$bottom_max = $this->page_hauteur - $heightforinfotot - $heightforfreetext - $heightforfooter + 1;
+				$bottom_max = $this->page_hauteur - $heightforfreetext - $heightforfooter + 1;
 				
 				if ($end_tab_y + $this->ONE_MORE_LINE > $bottom_max) {
 					// Pas de place pour les totaux, on ajoute une page pour les écrire à la page suivante
