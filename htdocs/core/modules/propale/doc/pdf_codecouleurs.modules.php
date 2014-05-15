@@ -464,7 +464,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				
 				// Placement pour les infos suivantes
 				$end_tab_y = $current_tab_height + $draw_tab_top;
-				$space_tab_tot = 100;
+				$space_tab_tot = 10;
 				$bottom_max = $this->page_hauteur - $heightforinfotot - $heightforfreetext - $heightforfooter + 1;
 				
 				if ($end_tab_y + $this->ONE_MORE_LINE > $bottom_max) {
@@ -491,8 +491,12 @@ class pdf_codecouleurs extends ModelePDFPropales
 				$posy=$this->_tableau_tot($pdf, $object, 0, $bottomlasttab, $outputlangs);
 
 				// Pied de page
-				$this->_pagefoot($pdf,$object,$outputlangs);
-				if (method_exists($pdf,'AliasNbPages')) $pdf->AliasNbPages();
+				for ($page = 1; $page <= $pdf->getNumPages(); $page++) {
+					$pdf->setPage($page);
+					$this->_pagefoot($pdf,$object,$outputlangs);
+				}
+				
+				if (method_exists($pdf,'AliasNbPages')) { $pdf->AliasNbPages(); }
 
 				$pdf->Close();
 
