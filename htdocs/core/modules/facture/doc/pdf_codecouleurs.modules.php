@@ -37,17 +37,17 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
  */
 class pdf_codecouleurs extends ModelePDFFactures
 {
-    var $db;
-    var $name;
-    var $description;
-    var $type;
+	var $db;
+	var $name;
+	var $description;
+	var $type;
 
-    var $phpmin = array(4,3,0); // Minimum version of PHP required by module
-    var $version = 'dolibarr';
+	var $phpmin = array(4,3,0); // Minimum version of PHP required by module
+	var $version = 'dolibarr';
 
-    var $page_largeur;
-    var $page_hauteur;
-    var $format;
+	var $page_largeur;
+	var $page_hauteur;
+	var $format;
 	var $marge_gauche;
 	var	$marge_droite;
 	var	$marge_haute;
@@ -102,7 +102,7 @@ class pdf_codecouleurs extends ModelePDFFactures
 
 		// Define position of columns
 		$this->posxdesc=$this->marge_gauche+1;
-                $this->posxtva=88;
+				$this->posxtva=88;
 		$this->posxup=116;
 		$this->posxqty=129;
 		$this->posxdiscount=144;
@@ -125,16 +125,16 @@ class pdf_codecouleurs extends ModelePDFFactures
 
 
 	/**
-     *  Function to build pdf onto disk
-     *
-     *  @param		Object		$object				Object to generate
-     *  @param		Translate	$outputlangs		Lang output object
-     *  @param		string		$srctemplatepath	Full path of source filename for generator using a template file
-     *  @param		int			$hidedetails		Do not show line details
-     *  @param		int			$hidedesc			Do not show desc
-     *  @param		int			$hideref			Do not show ref
-     *  @param		object		$hookmanager		Hookmanager object
-     *  @return     int         	    			1=OK, 0=KO
+	 *  Function to build pdf onto disk
+	 *
+	 *  @param		Object		$object				Object to generate
+	 *  @param		Translate	$outputlangs		Lang output object
+	 *  @param		string		$srctemplatepath	Full path of source filename for generator using a template file
+	 *  @param		int			$hidedetails		Do not show line details
+	 *  @param		int			$hidedesc			Do not show desc
+	 *  @param		int			$hideref			Do not show ref
+	 *  @param		object		$hookmanager		Hookmanager object
+	 *  @return     int         	    			1=OK, 0=KO
 	 */
 	function write_file($object,$outputlangs,$srctemplatepath='',$hidedetails=0,$hidedesc=0,$hideref=0,$hookmanager=false)
 	{
@@ -183,26 +183,26 @@ class pdf_codecouleurs extends ModelePDFFactures
 			{
 				$nblignes = count($object->lines);
 
-                $pdf=pdf_getInstance($this->format);
-                $default_font_size = pdf_getPDFFontSize($outputlangs);	// Must be after pdf_getInstance
+				$pdf=pdf_getInstance($this->format);
+				$default_font_size = pdf_getPDFFontSize($outputlangs);	// Must be after pdf_getInstance
 				$heightforinfotot = 50;	// Height reserved to output the info and total part
-		        $heightforfreetext= (isset($conf->global->MAIN_PDF_FREETEXT_HEIGHT)?$conf->global->MAIN_PDF_FREETEXT_HEIGHT:5);	// Height reserved to output the free text on last page
-	            $heightforfooter = $this->marge_basse + 8;	// Height reserved to output the footer (value include bottom margin)
-                $pdf->SetAutoPageBreak(1,0);
+				$heightforfreetext= (isset($conf->global->MAIN_PDF_FREETEXT_HEIGHT)?$conf->global->MAIN_PDF_FREETEXT_HEIGHT:5);	// Height reserved to output the free text on last page
+				$heightforfooter = $this->marge_basse + 8;	// Height reserved to output the footer (value include bottom margin)
+				$pdf->SetAutoPageBreak(1,0);
 
-                if (class_exists('TCPDF'))
-                {
-                    $pdf->setPrintHeader(false);
-                    $pdf->setPrintFooter(false);
-                }
-                $pdf->SetFont(pdf_getPDFFont($outputlangs));
+				if (class_exists('TCPDF'))
+				{
+					$pdf->setPrintHeader(false);
+					$pdf->setPrintFooter(false);
+				}
+				$pdf->SetFont(pdf_getPDFFont($outputlangs));
 
-                // Set path to the background PDF File
-                if (empty($conf->global->MAIN_DISABLE_FPDI) && ! empty($conf->global->MAIN_ADD_PDF_BACKGROUND))
-                {
-				    $pagecount = $pdf->setSourceFile($conf->mycompany->dir_output.'/'.$conf->global->MAIN_ADD_PDF_BACKGROUND);
-				    $tplidx = $pdf->importPage(1);
-                }
+				// Set path to the background PDF File
+				if (empty($conf->global->MAIN_DISABLE_FPDI) && ! empty($conf->global->MAIN_ADD_PDF_BACKGROUND))
+				{
+					$pagecount = $pdf->setSourceFile($conf->mycompany->dir_output.'/'.$conf->global->MAIN_ADD_PDF_BACKGROUND);
+					$tplidx = $pdf->importPage(1);
+				}
 
 				$pdf->Open();
 				$pagenb=0;
@@ -247,7 +247,7 @@ class pdf_codecouleurs extends ModelePDFFactures
 					$tab_top = 88;
 
 					$pdf->SetFont('','', $default_font_size - 1);
-                    $pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($object->note_public), 0, 1);
+					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($object->note_public), 0, 1);
 					$nexY = $pdf->GetY();
 					$height_note=$nexY-$tab_top;
 
@@ -284,22 +284,22 @@ class pdf_codecouleurs extends ModelePDFFactures
 					$showpricebeforepagebreak=1;
 
 					$pdf->startTransaction();
-                                        
-                                        //$qty = pdf_getlineqty($object, $i, $outputlangs, $hidedetails, $hookmanager);
-                                        $qty = $object->lines[$i]->qty;
-                                        
-                                        
-                                        if($object->lines[$i]->desc == '-') {
-                                            $pdf->line($this->marge_gauche, $curY, $this->page_largeur - $this->marge_droite, $curY);
-                                            $pdf->MultiCell($this->posxtva-$curX, 0, '', 0, '', false, 0, $curX, $curY, true, 0, true, true, 0, 'T', false);
-                                        } else {
-                                            if($qty == 0) {
-                                                $pdf->SetFont('', 'B', $default_font_size - 1);
-                                            }
-                                            pdf_writelinedesc($pdf,$object,$i,$outputlangs,$this->posxtva-$curX,3,$curX,$curY,$hideref,$hidedesc,0,$hookmanager);
-                                           
-                                        }
-                                        $pdf->SetFont('','', $default_font_size - 1);
+
+					//$qty = pdf_getlineqty($object, $i, $outputlangs, $hidedetails, $hookmanager);
+					$qty = $object->lines[$i]->qty;
+
+
+					if($object->lines[$i]->desc == '-') {
+						$pdf->line($this->marge_gauche, $curY, $this->page_largeur - $this->marge_droite, $curY);
+						$pdf->MultiCell($this->posxtva-$curX, 0, '', 0, '', false, 0, $curX, $curY, true, 0, true, true, 0, 'T', false);
+					} else {
+						if($qty == 0) {
+							$pdf->SetFont('', 'B', $default_font_size - 1);
+						}
+						pdf_writelinedesc($pdf,$object,$i,$outputlangs,$this->posxtva-$curX,3,$curX,$curY,$hideref,$hidedesc,0,$hookmanager);
+
+					}
+					$pdf->SetFont('','', $default_font_size - 1);
 					$pageposafter=$pdf->getPage();
 					if ($pageposafter > $pageposbefore)	// There is a pagebreak
 					{
@@ -307,11 +307,11 @@ class pdf_codecouleurs extends ModelePDFFactures
 						$pageposafter=$pageposbefore;
 						//print $pageposafter.'-'.$pageposbefore;exit;
 						$pdf->setPageOrientation('', 1, $heightforfooter);	// The only function to edit the bottom margin of current page to set it.
-                                                if($qty == 0) {
-                                                    $pdf->SetFont('', 'B', $default_font_size - 1);
-                                                }
+						if($qty == 0) {
+							$pdf->SetFont('', 'B', $default_font_size - 1);
+						}
 						pdf_writelinedesc($pdf,$object,$i,$outputlangs,$this->posxtva-$curX,4,$curX,$curY,$hideref,$hidedesc,0,$hookmanager);
-                                                $pdf->SetFont('','', $default_font_size - 1);
+												$pdf->SetFont('','', $default_font_size - 1);
 						$pageposafter=$pdf->getPage();
 						$posyafter=$pdf->GetY();
 						//var_dump($posyafter); var_dump(($this->page_hauteur - ($heightforfooter+$heightforfreetext+$heightforinfotot))); exit;
@@ -348,41 +348,41 @@ class pdf_codecouleurs extends ModelePDFFactures
 					}
 
 					$pdf->SetFont('','', $default_font_size - 1);   // On repositionne la police par defaut
-                                        if($qty > 0) {
+										if($qty > 0) {
 					// Unit price before discount
 					if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT))
 					{
 						$pdf->SetXY($this->posxtva, $curY);
-                                                $up_excl_tax = pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails, $hookmanager);
-                                                $pdf->MultiCell($this->posxup-$this->posxtva-1, 3, $up_excl_tax, 0, 'R');
+												$up_excl_tax = pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails, $hookmanager);
+												$pdf->MultiCell($this->posxup-$this->posxtva-1, 3, $up_excl_tax, 0, 'R');
 					}
-                                        
-                                        // Discount on line
+
+										// Discount on line
 					if ($object->lines[$i]->remise_percent)
 					{
-                                            $pdf->SetXY($this->posxup, $curY);
-                                            $remise_percent = pdf_getlineremisepercent($object, $i, $outputlangs, $hidedetails, $hookmanager);
-                                            $pdf->MultiCell($this->posxqty-$this->posxup-1, 3, $remise_percent, 0, 'R', 0);
-                                        }
-					
-                                        // VAT Rate
+											$pdf->SetXY($this->posxup, $curY);
+											$remise_percent = pdf_getlineremisepercent($object, $i, $outputlangs, $hidedetails, $hookmanager);
+											$pdf->MultiCell($this->posxqty-$this->posxup-1, 3, $remise_percent, 0, 'R', 0);
+										}
+
+										// VAT Rate
 					$vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails, $hookmanager);
 					$pdf->SetXY($this->posxqty, $curY);
-                                        $pdf->MultiCell($this->posxdiscount-$this->posxqty-1, 3, $vat_rate, 0, 'R');	// Enough for 6 chars
+										$pdf->MultiCell($this->posxdiscount-$this->posxqty-1, 3, $vat_rate, 0, 'R');	// Enough for 6 chars
 
 					// VAT Amount
-                                        $pdf->SetXY($this->posxdiscount-2, $curY);
-                                        $total_ttc = $object->lines[$i]->total_ttc;
-                                        $total_ht = $object->lines[$i]->total_ht;
-                                        $vat_amount = price($total_ttc - $total_ht, 0, '', 0, 2, 2);
-                                        $pdf->MultiCell($this->postotalht-$this->posxdiscount+1, 3, $vat_amount, 0, 'R');
-					
+										$pdf->SetXY($this->posxdiscount-2, $curY);
+										$total_ttc = $object->lines[$i]->total_ttc;
+										$total_ht = $object->lines[$i]->total_ht;
+										$vat_amount = price($total_ttc - $total_ht, 0, '', 0, 2, 2);
+										$pdf->MultiCell($this->postotalht-$this->posxdiscount+1, 3, $vat_amount, 0, 'R');
+
 
 					// Total TTC
-                                        $total_incl_tax = pdf_getlinetotalwithtax($object, $i, $outputlangs, $hidedetails);
+										$total_incl_tax = pdf_getlinetotalwithtax($object, $i, $outputlangs, $hidedetails);
 					$pdf->SetXY($this->postotalht, $curY);
 					$pdf->MultiCell($this->page_largeur-$this->marge_droite-$this->postotalht, 3, $total_incl_tax, 0, 'R', 0);
-                                        }
+										}
 					// Collecte des totaux par valeur de tva dans $this->tva["taux"]=total_tva
 					$tvaligne=$object->lines[$i]->total_tva;
 					$localtax1ligne=$object->lines[$i]->total_localtax1;
@@ -519,11 +519,11 @@ class pdf_codecouleurs extends ModelePDFFactures
 	/**
 	 *  Show payments table
 	 *
-     *  @param	PDF			&$pdf           Object PDF
-     *  @param  Object		$object         Object invoice
-     *  @param  int			$posy           Position y in PDF
-     *  @param  Translate	$outputlangs    Object langs for output
-     *  @return int             			<0 if KO, >0 if OK
+	 *  @param	PDF			&$pdf           Object PDF
+	 *  @param  Object		$object         Object invoice
+	 *  @param  int			$posy           Position y in PDF
+	 *  @param  Translate	$outputlangs    Object langs for output
+	 *  @return int             			<0 if KO, >0 if OK
 	 */
 	function _tableau_versements(&$pdf, $object, $posy, $outputlangs)
 	{
@@ -672,8 +672,8 @@ class pdf_codecouleurs extends ModelePDFFactures
 
 			$posy=$pdf->GetY()+4;
 		}
-                
-                if ($object->client->pays_code == 'CH')
+
+				if ($object->client->pays_code == 'CH')
 		{
 			$pdf->SetFont('','B', $default_font_size - 2);
 			$pdf->SetXY($this->marge_gauche, $posy);
@@ -681,8 +681,8 @@ class pdf_codecouleurs extends ModelePDFFactures
 
 			$posy=$pdf->GetY()+4;
 		}
-                
-                if ($object->client->pays_code == 'BE')
+
+				if ($object->client->pays_code == 'BE')
 		{
 			$pdf->SetFont('','B', $default_font_size - 2);
 			$pdf->SetXY($this->marge_gauche, $posy);
@@ -760,13 +760,13 @@ class pdf_codecouleurs extends ModelePDFFactures
 						$pdf->MultiCell(100, 3, $outputlangs->transnoentities('PaymentByChequeOrderedTo',$account->proprio),0,'L',0);
 						$posy=$pdf->GetY()+1;
 
-			            if (empty($conf->global->MAIN_PDF_HIDE_CHQ_ADDRESS))
-			            {
+						if (empty($conf->global->MAIN_PDF_HIDE_CHQ_ADDRESS))
+						{
 							$pdf->SetXY($this->marge_gauche, $posy);
 							$pdf->SetFont('','', $default_font_size - 3);
 							$pdf->MultiCell(100, 3, $outputlangs->convToOutputCharset($account->adresse_proprio), 0, 'L', 0);
 							$posy=$pdf->GetY()+2;
-			            }
+						}
 					}
 					if ($conf->global->FACTURE_CHQ_NUMBER == -1)
 					{
@@ -775,13 +775,13 @@ class pdf_codecouleurs extends ModelePDFFactures
 						$pdf->MultiCell(100, 3, $outputlangs->transnoentities('PaymentByChequeOrderedTo',$this->emetteur->name),0,'L',0);
 						$posy=$pdf->GetY()+1;
 
-			            if (empty($conf->global->MAIN_PDF_HIDE_CHQ_ADDRESS))
-			            {
+						if (empty($conf->global->MAIN_PDF_HIDE_CHQ_ADDRESS))
+						{
 							$pdf->SetXY($this->marge_gauche, $posy);
 							$pdf->SetFont('','', $default_font_size - 3);
 							$pdf->MultiCell(100, 3, $outputlangs->convToOutputCharset($this->emetteur->getFullAddress()), 0, 'L', 0);
 							$posy=$pdf->GetY()+2;
-			            }
+						}
 					}
 				}
 			}
@@ -822,10 +822,10 @@ class pdf_codecouleurs extends ModelePDFFactures
 	{
 		global $conf,$mysoc;
 
-        $sign=1;
-        if ($object->type == 2 && ! empty($conf->global->INVOICE_POSITIVE_CREDIT_NOTE)) $sign=-1;
+		$sign=1;
+		if ($object->type == 2 && ! empty($conf->global->INVOICE_POSITIVE_CREDIT_NOTE)) $sign=-1;
 
-        $default_font_size = pdf_getPDFFontSize($outputlangs);
+		$default_font_size = pdf_getPDFFontSize($outputlangs);
 
 		$tab2_top = $posy;
 		$tab2_hl = 4;
@@ -1095,45 +1095,44 @@ class pdf_codecouleurs extends ModelePDFFactures
 			if (empty($hidetop))
 			{
 				$pdf->SetXY($this->posxtva-3, $tab_top+1);
-                                $pdf->MultiCell($this->posxup-$this->posxtva+3,2, $outputlangs->transnoentities("PriceUHT"),'','C');
+				$pdf->MultiCell($this->posxup-$this->posxtva+3,2, $outputlangs->transnoentities("PriceUHT"),'','C');
 			}
 		}
 
 		$pdf->line($this->posxup-1, $tab_top, $this->posxup-1, $tab_top + $tab_height);
 		if (empty($hidetop))
 		{
-                    if ($this->atleastonediscount)
-                    {
-			$pdf->SetXY($this->posxup-1, $tab_top+1);
-                        $pdf->MultiCell($this->posxqty-$this->posxup-1,2, $outputlangs->transnoentities("ReductionShort"),'','C');
-                    }
+			if ($this->atleastonediscount)
+			{
+				$pdf->SetXY($this->posxup-1, $tab_top+1);
+				$pdf->MultiCell($this->posxqty-$this->posxup-1,2, $outputlangs->transnoentities("ReductionShort"),'','C');
+			}
 		}
-                
+
 		if ($this->atleastonediscount)
 		{
 			$pdf->line($this->posxqty, $tab_top, $this->posxqty, $tab_top + $tab_height);
 		}
-                
+
 		//$pdf->line($this->posxqty-1, $tab_top, $this->posxqty-1, $tab_top + $tab_height);
 		if (empty($hidetop))
 		{
-			$pdf->SetXY($this->posxqty-1, $tab_top+1);
-                        $pdf->MultiCell($this->posxdiscount-$this->posxqty-1,2, "TVA (%)",'','C');
+			$pdf->SetXY($this->posxqty-10, $tab_top+1);
+			$pdf->MultiCell($this->posxdiscount-$this->posxqty+9,2, "TVA (%)",'','C');
 		}
 
 		$pdf->line($this->posxdiscount-1, $tab_top, $this->posxdiscount-1, $tab_top + $tab_height);
 		if (empty($hidetop))
 		{
-                    $pdf->SetXY($this->posxdiscount-1, $tab_top+1);
-                    $pdf->MultiCell($this->postotalht-$this->posxdiscount+1,2, "TVA",'','C');
-			
+			$pdf->SetXY($this->posxdiscount-1, $tab_top+1);
+			$pdf->MultiCell($this->postotalht-$this->posxdiscount+1,2, "TVA",'','C');
 		}
-                
-                $pdf->line($this->postotalht-1, $tab_top, $this->postotalht-1, $tab_top + $tab_height);
+
+		$pdf->line($this->postotalht-1, $tab_top, $this->postotalht-1, $tab_top + $tab_height);
 		if (empty($hidetop))
 		{
 			$pdf->SetXY($this->postotalht-1, $tab_top+1);
-                        $pdf->MultiCell(30,2, $outputlangs->transnoentities("TotalTTC"),'','C');
+			$pdf->MultiCell(30,2, $outputlangs->transnoentities("TotalTTC"),'','C');
 		}
 	}
 
@@ -1149,7 +1148,7 @@ class pdf_codecouleurs extends ModelePDFFactures
 	 */
 	function _pagehead(&$pdf, $object, $showaddress, $outputlangs, $hookmanager)
 	{
-            
+
 		global $conf,$langs;
 
 		$outputlangs->load("main");
@@ -1163,15 +1162,15 @@ class pdf_codecouleurs extends ModelePDFFactures
 
 		// Show Draft Watermark
 		if($object->statut==0 && (! empty($conf->global->FACTURE_DRAFT_WATERMARK)) )
-        {
-		      pdf_watermark($pdf,$outputlangs,$this->page_hauteur,$this->page_largeur,'mm',$conf->global->FACTURE_DRAFT_WATERMARK);
-        }
+		{
+			  pdf_watermark($pdf,$outputlangs,$this->page_hauteur,$this->page_largeur,'mm',$conf->global->FACTURE_DRAFT_WATERMARK);
+		}
 
 		$pdf->SetTextColor(0,0,60);
 		$pdf->SetFont('','B', $default_font_size + 3);
 
 		$posy=$this->marge_haute;
-        $posx=$this->page_largeur-$this->marge_droite-100;
+		$posx=$this->page_largeur-$this->marge_droite-100;
 
 		$pdf->SetXY($this->marge_gauche,$posy);
 
@@ -1181,7 +1180,7 @@ class pdf_codecouleurs extends ModelePDFFactures
 		{
 			if (is_readable($logo))
 			{
-			    $height=pdf_getHeightForLogo($logo);
+				$height=pdf_getHeightForLogo($logo);
 				$pdf->Image($logo, $this->marge_gauche, $posy, 0, $height);	// width=0 (auto)
 			}
 			else
@@ -1288,23 +1287,23 @@ class pdf_codecouleurs extends ModelePDFFactures
 		{
 			// Sender properties
 			//$carac_emetteur = pdf_build_address($outputlangs,$this->emetteur);
-                    
-                    
-                        // If BILLING contact defined on invoice, we use it
+
+
+						// If BILLING contact defined on invoice, we use it
 			$usecontact=false;
 			$arrayidcontact=$object->getIdContact('internal','SALESREPFOLL');
-                        
+
 			if (count($arrayidcontact) > 0)
 			{
 				$usecontact=true;
 				$result=$object->fetch_user($arrayidcontact[0]);
 			}
-			
+
 			$carac_emetteur=pdf_build_address($outputlangs,$this->emetteur,$object->user,($usecontact?$object->user:''),$usecontact,'source');
 
-                        
-                        
-                        
+
+
+
 			// Show sender
 			$posy=42;
 			$posx=$this->marge_gauche;
@@ -1336,7 +1335,7 @@ class pdf_codecouleurs extends ModelePDFFactures
 			// If BILLING contact defined on invoice, we use it
 			$usecontact=false;
 			$arrayidcontact=$object->getIdContact('external','BILLING');
-                        
+
 			if (count($arrayidcontact) > 0)
 			{
 				$usecontact=true;
@@ -1386,7 +1385,7 @@ class pdf_codecouleurs extends ModelePDFFactures
 
 	/**
 	 *   	Show footer of page. Need this->emetteur object
-     *
+	 *
 	 *   	@param	PDF			&$pdf     			PDF
 	 * 		@param	Object		$object				Object to show
 	 *      @param	Translate	$outputlangs		Object lang for output
@@ -1395,11 +1394,11 @@ class pdf_codecouleurs extends ModelePDFFactures
 	 */
 	function _pagefoot(&$pdf,$object,$outputlangs,$hidefreetext=0)
 	{
-            return self::pdf_pagefoot_codecouleurs($pdf,$outputlangs,'PROPALE_FREE_TEXT',$this->emetteur,$this->marge_basse,$this->marge_gauche,$this->page_hauteur,$object,0,$hidefreetext);
+			return self::pdf_pagefoot_codecouleurs($pdf,$outputlangs,'PROPALE_FREE_TEXT',$this->emetteur,$this->marge_basse,$this->marge_gauche,$this->page_hauteur,$object,0,$hidefreetext);
 		//return pdf_pagefoot($pdf,$outputlangs,'FACTURE_FREE_TEXT',$this->emetteur,$this->marge_basse,$this->marge_gauche,$this->page_hauteur,$object,0,$hidefreetext);
 	}
-        
-        /**
+
+		/**
  *  Show footer of page for PDF generation
  *
  *	@param	PDF			&$pdf     		The PDF factory
@@ -1414,200 +1413,198 @@ class pdf_codecouleurs extends ModelePDFFactures
  *  @param	int			$hidefreetext	1=Hide free text, 0=Show free text
  * 	@return	int							Return height of bottom margin including footer text
  */
-function pdf_pagefoot_codecouleurs(&$pdf,$outputlangs,$paramfreetext,$fromcompany,$marge_basse,$marge_gauche,$page_hauteur,$object,$showdetails=0,$hidefreetext=0)
-{
-	global $conf,$user;
-
-	$outputlangs->load("dict");
-	$line='';
-
-	$dims=$pdf->getPageDimensions();
-
-	// Line of free text
-	if (empty($hidefreetext) && ! empty($conf->global->$paramfreetext))
+	function pdf_pagefoot_codecouleurs(&$pdf,$outputlangs,$paramfreetext,$fromcompany,$marge_basse,$marge_gauche,$page_hauteur,$object,$showdetails=0,$hidefreetext=0)
 	{
-		// Make substitution
-		$substitutionarray=array(
-			'__FROM_NAME__' => $fromcompany->nom,
-			'__FROM_EMAIL__' => $fromcompany->email,
-			'__TOTAL_TTC__' => $object->total_ttc,
-			'__TOTAL_HT__' => $object->total_ht,
-			'__TOTAL_VAT__' => $object->total_vat
-		);
-		complete_substitutions_array($substitutionarray,$outputlangs,$object);
-		$newfreetext=make_substitutions($conf->global->$paramfreetext,$substitutionarray);
-		$line.=$outputlangs->convToOutputCharset($newfreetext);
-	}
+		global $conf,$user;
 
-	// First line of company infos
+		$outputlangs->load("dict");
+		$line='';
 
-	if ($showdetails)
-	{
-		$line1="";
-		// Company name
-		if ($fromcompany->name)
+		$dims=$pdf->getPageDimensions();
+
+		// Line of free text
+		if (empty($hidefreetext) && ! empty($conf->global->$paramfreetext))
 		{
-			$line1.=($line1?" - ":"").$outputlangs->transnoentities("RegisteredOffice").": ".$fromcompany->name;
+			// Make substitution
+			$substitutionarray=array(
+				'__FROM_NAME__' => $fromcompany->nom,
+				'__FROM_EMAIL__' => $fromcompany->email,
+				'__TOTAL_TTC__' => $object->total_ttc,
+				'__TOTAL_HT__' => $object->total_ht,
+				'__TOTAL_VAT__' => $object->total_vat
+			);
+			complete_substitutions_array($substitutionarray,$outputlangs,$object);
+			$newfreetext=make_substitutions($conf->global->$paramfreetext,$substitutionarray);
+			$line.=$outputlangs->convToOutputCharset($newfreetext);
 		}
-		// Address
-		if ($fromcompany->address)
+
+		// First line of company infos
+
+		if ($showdetails)
 		{
-			$line1.=($line1?" - ":"").$fromcompany->address;
+			$line1="";
+			// Company name
+			if ($fromcompany->name)
+			{
+				$line1.=($line1?" - ":"").$outputlangs->transnoentities("RegisteredOffice").": ".$fromcompany->name;
+			}
+			// Address
+			if ($fromcompany->address)
+			{
+				$line1.=($line1?" - ":"").$fromcompany->address;
+			}
+			// Zip code
+			if ($fromcompany->zip)
+			{
+				$line1.=($line1?" - ":"").$fromcompany->zip;
+			}
+			// Town
+			if ($fromcompany->town)
+			{
+				$line1.=($line1?" ":"").$fromcompany->town;
+			}
+			// Phone
+			if ($fromcompany->phone)
+			{
+				$line1.=($line1?" - ":"").$outputlangs->transnoentities("Phone").": ".$fromcompany->phone;
+			}
+			// Fax
+			if ($fromcompany->fax)
+			{
+				$line1.=($line1?" - ":"").$outputlangs->transnoentities("Fax").": ".$fromcompany->fax;
+			}
+
+			$line2="";
+			// URL
+			if ($fromcompany->url)
+			{
+				$line2.=($line2?" - ":"").$fromcompany->url;
+			}
+			// Email
+			if ($fromcompany->email)
+			{
+				$line2.=($line2?" - ":"").$fromcompany->email;
+			}
 		}
-		// Zip code
-		if ($fromcompany->zip)
+
+		// Line 3 of company infos
+		$line3="";
+		// Juridical status
+		if ($fromcompany->forme_juridique_code)
 		{
-			$line1.=($line1?" - ":"").$fromcompany->zip;
+			$line3.=($line3?" - ":"").$outputlangs->convToOutputCharset(getFormeJuridiqueLabel($fromcompany->forme_juridique_code));
 		}
-		// Town
-		if ($fromcompany->town)
+		// Capital
+		if ($fromcompany->capital)
 		{
-			$line1.=($line1?" ":"").$fromcompany->town;
+			//$line3.=($line3?" - ":"").$outputlangs->transnoentities("CapitalOf",$fromcompany->capital);
+					$line3.=($line3?" - ":"").$fromcompany->capital;
 		}
-		// Phone
-		if ($fromcompany->phone)
+		// Prof Id 1
+		if ($fromcompany->idprof1 && ($fromcompany->country_code != 'FR' || ! $fromcompany->idprof2))
 		{
-			$line1.=($line1?" - ":"").$outputlangs->transnoentities("Phone").": ".$fromcompany->phone;
+			$field=$outputlangs->transcountrynoentities("ProfId1",$fromcompany->country_code);
+			if (preg_match('/\((.*)\)/i',$field,$reg)) $field=$reg[1];
+			$line3.=($line3?" - ":"").$field.": ".$outputlangs->convToOutputCharset($fromcompany->idprof1);
 		}
-		// Fax
-		if ($fromcompany->fax)
+		// Prof Id 2
+		if ($fromcompany->idprof2)
 		{
-			$line1.=($line1?" - ":"").$outputlangs->transnoentities("Fax").": ".$fromcompany->fax;
+			$field=$outputlangs->transcountrynoentities("ProfId2",$fromcompany->country_code);
+			if (preg_match('/\((.*)\)/i',$field,$reg)) $field=$reg[1];
+			$line3.=($line3?" - ":"").$field.": ".$outputlangs->convToOutputCharset($fromcompany->idprof2);
 		}
 
-		$line2="";
-		// URL
-		if ($fromcompany->url)
+		// Line 4 of company infos
+		$line4="";
+		// Prof Id 3
+		if ($fromcompany->idprof3)
 		{
-			$line2.=($line2?" - ":"").$fromcompany->url;
+			$field=$outputlangs->transcountrynoentities("ProfId3",$fromcompany->country_code);
+			if (preg_match('/\((.*)\)/i',$field,$reg)) $field=$reg[1];
+			$line4.=($line4?" - ":"").$field.": ".$outputlangs->convToOutputCharset($fromcompany->idprof3);
 		}
-		// Email
-		if ($fromcompany->email)
+		// Prof Id 4
+		if ($fromcompany->idprof4)
 		{
-			$line2.=($line2?" - ":"").$fromcompany->email;
+			$field=$outputlangs->transcountrynoentities("ProfId4",$fromcompany->country_code);
+			if (preg_match('/\((.*)\)/i',$field,$reg)) $field=$reg[1];
+			$line4.=($line4?" - ":"").$field.": ".$outputlangs->convToOutputCharset($fromcompany->idprof4);
 		}
-	}
-
-	// Line 3 of company infos
-	$line3="";
-	// Juridical status
-	if ($fromcompany->forme_juridique_code)
-	{
-		$line3.=($line3?" - ":"").$outputlangs->convToOutputCharset(getFormeJuridiqueLabel($fromcompany->forme_juridique_code));
-	}
-	// Capital
-	if ($fromcompany->capital)
-	{
-		//$line3.=($line3?" - ":"").$outputlangs->transnoentities("CapitalOf",$fromcompany->capital);
-                $line3.=($line3?" - ":"").$fromcompany->capital;
-	}
-	// Prof Id 1
-	if ($fromcompany->idprof1 && ($fromcompany->country_code != 'FR' || ! $fromcompany->idprof2))
-	{
-		$field=$outputlangs->transcountrynoentities("ProfId1",$fromcompany->country_code);
-		if (preg_match('/\((.*)\)/i',$field,$reg)) $field=$reg[1];
-		$line3.=($line3?" - ":"").$field.": ".$outputlangs->convToOutputCharset($fromcompany->idprof1);
-	}
-	// Prof Id 2
-	if ($fromcompany->idprof2)
-	{
-		$field=$outputlangs->transcountrynoentities("ProfId2",$fromcompany->country_code);
-		if (preg_match('/\((.*)\)/i',$field,$reg)) $field=$reg[1];
-		$line3.=($line3?" - ":"").$field.": ".$outputlangs->convToOutputCharset($fromcompany->idprof2);
-	}
-
-	// Line 4 of company infos
-	$line4="";
-	// Prof Id 3
-	if ($fromcompany->idprof3)
-	{
-		$field=$outputlangs->transcountrynoentities("ProfId3",$fromcompany->country_code);
-		if (preg_match('/\((.*)\)/i',$field,$reg)) $field=$reg[1];
-		$line4.=($line4?" - ":"").$field.": ".$outputlangs->convToOutputCharset($fromcompany->idprof3);
-	}
-	// Prof Id 4
-	if ($fromcompany->idprof4)
-	{
-		$field=$outputlangs->transcountrynoentities("ProfId4",$fromcompany->country_code);
-		if (preg_match('/\((.*)\)/i',$field,$reg)) $field=$reg[1];
-		$line4.=($line4?" - ":"").$field.": ".$outputlangs->convToOutputCharset($fromcompany->idprof4);
-	}
-	// IntraCommunautary VAT
-	if ($fromcompany->tva_intra != '')
-	{
-		$line4.=($line4?" - ":"").$outputlangs->transnoentities("VATIntraShort").": ".$outputlangs->convToOutputCharset($fromcompany->tva_intra);
-	}
-
-	$pdf->SetFont('','',7);
-	$pdf->SetDrawColor(224,224,224);
-
-	// On positionne le debut du bas de page selon nbre de lignes de ce bas de page
-	$freetextheight=0;
-	if ($line)	// Free text
-	{
-		$width=20000; $align='L';	// By default, ask a manual break: We use a large value 20000, to not have automatic wrap. This make user understand, he need to add CR on its text.
-		if (! empty($conf->global->MAIN_USE_AUTOWRAP_ON_FREETEXT)) {
-			$width=200; $align='C';
+		// IntraCommunautary VAT
+		if ($fromcompany->tva_intra != '')
+		{
+			$line4.=($line4?" - ":"").$outputlangs->transnoentities("VATIntraShort").": ".$outputlangs->convToOutputCharset($fromcompany->tva_intra);
 		}
-		$freetextheight=$pdf->getStringHeight($width,$line);
-	}
 
-	$marginwithfooter=$marge_basse + $freetextheight + (! empty($line1)?3:0) + (! empty($line2)?3:0) + (! empty($line3)?3:0) + (! empty($line4)?3:0);
-	$posy=$marginwithfooter+0;
-
-	if ($line)	// Free text
-	{
-		$pdf->SetXY($dims['lm'],-$posy);
-		$pdf->MultiCell($width, 3, $line, 0, $align, 0);
-		$posy-=$freetextheight;
-	}
-
-	$pdf->SetY(-$posy);
-	$pdf->line($dims['lm'], $dims['hk']-$posy, $dims['wk']-$dims['rm'], $dims['hk']-$posy);
-	$posy--;
-
-	if (! empty($line1))
-	{
-		$pdf->SetFont('','B',7);
-		$pdf->SetXY($dims['lm'],-$posy);
-		$pdf->MultiCell(200, 2, $line1, 0, 'C', 0);
-		$posy-=3;
 		$pdf->SetFont('','',7);
+		$pdf->SetDrawColor(224,224,224);
+
+		// On positionne le debut du bas de page selon nbre de lignes de ce bas de page
+		$freetextheight=0;
+		if ($line)	// Free text
+		{
+			$width=20000; $align='L';	// By default, ask a manual break: We use a large value 20000, to not have automatic wrap. This make user understand, he need to add CR on its text.
+			if (! empty($conf->global->MAIN_USE_AUTOWRAP_ON_FREETEXT)) {
+				$width=200; $align='C';
+			}
+			$freetextheight=$pdf->getStringHeight($width,$line);
+		}
+
+		$marginwithfooter=$marge_basse + $freetextheight + (! empty($line1)?3:0) + (! empty($line2)?3:0) + (! empty($line3)?3:0) + (! empty($line4)?3:0);
+		$posy=$marginwithfooter+0;
+
+		if ($line)	// Free text
+		{
+			$pdf->SetXY($dims['lm'],-$posy);
+			$pdf->MultiCell($width, 3, $line, 0, $align, 0);
+			$posy-=$freetextheight;
+		}
+
+		$pdf->SetY(-$posy);
+		$pdf->line($dims['lm'], $dims['hk']-$posy, $dims['wk']-$dims['rm'], $dims['hk']-$posy);
+		$posy--;
+
+		if (! empty($line1))
+		{
+			$pdf->SetFont('','B',7);
+			$pdf->SetXY($dims['lm'],-$posy);
+			$pdf->MultiCell(200, 2, $line1, 0, 'C', 0);
+			$posy-=3;
+			$pdf->SetFont('','',7);
+		}
+
+		if (! empty($line2))
+		{
+			$pdf->SetFont('','B',7);
+			$pdf->SetXY($dims['lm'],-$posy);
+			$pdf->MultiCell(200, 2, $line2, 0, 'C', 0);
+			$posy-=3;
+			$pdf->SetFont('','',7);
+		}
+
+		if (! empty($line3))
+		{
+			$pdf->SetXY($dims['lm'],-$posy);
+			$pdf->MultiCell(200, 2, $line3, 0, 'C', 0);
+		}
+
+		if (! empty($line4))
+		{
+			$posy-=3;
+			$pdf->SetXY($dims['lm'],-$posy);
+			$pdf->MultiCell(200, 2, $line4, 0, 'C', 0);
+		}
+
+		// Show page nb only on iso languages (so default Helvetica font)
+		if (pdf_getPDFFont($outputlangs) == 'Helvetica')
+		{
+			$pdf->SetXY(-20,-$posy);
+			$pdf->MultiCell(11, 2, $pdf->PageNo().'/'.$pdf->getAliasNbPages(), 0, 'R', 0);
+			//print 'xxx'.$pdf->getAliasNbPages().'-'.$pdf->getAliasNumPage();exit;
+		}
+
+		return $marginwithfooter;
 	}
 
-	if (! empty($line2))
-	{
-		$pdf->SetFont('','B',7);
-		$pdf->SetXY($dims['lm'],-$posy);
-		$pdf->MultiCell(200, 2, $line2, 0, 'C', 0);
-		$posy-=3;
-		$pdf->SetFont('','',7);
-	}
-
-	if (! empty($line3))
-	{
-		$pdf->SetXY($dims['lm'],-$posy);
-		$pdf->MultiCell(200, 2, $line3, 0, 'C', 0);
-	}
-
-	if (! empty($line4))
-	{
-		$posy-=3;
-		$pdf->SetXY($dims['lm'],-$posy);
-		$pdf->MultiCell(200, 2, $line4, 0, 'C', 0);
-	}
-
-	// Show page nb only on iso languages (so default Helvetica font)
-	if (pdf_getPDFFont($outputlangs) == 'Helvetica')
-	{
-		$pdf->SetXY(-20,-$posy);
-		$pdf->MultiCell(11, 2, $pdf->PageNo().'/'.$pdf->getAliasNbPages(), 0, 'R', 0);
-		//print 'xxx'.$pdf->getAliasNbPages().'-'.$pdf->getAliasNumPage();exit;
-	}
-
-	return $marginwithfooter;
 }
-
-}
-
-?>
