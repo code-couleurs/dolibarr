@@ -59,6 +59,8 @@ if (! empty($conf->margin->enabled))
 
 $error=0;
 
+$set_title_devis_action = 'set_title';
+
 $id=GETPOST('id','int');
 $ref=GETPOST('ref','alpha');
 $socid=GETPOST('socid','int');
@@ -276,6 +278,12 @@ else if ($action == 'set_ref_client' && $user->rights->propal->creer)
 	$object->set_ref_client($user, $_POST['ref_client']);
 }
 
+// Positionne ref client
+else if ($action == $set_title_devis_action && $user->rights->propal->creer)
+{
+	$object->set_titre($user, $_POST['propale_title']);
+}
+
 else if ($action == 'setnote_public' && $user->rights->propal->creer)
 {
 	$result=$object->update_note(dol_html_entity_decode(GETPOST('note_public'), ENT_QUOTES),'_public');
@@ -345,6 +353,7 @@ else if ($action == 'add' && $user->rights->propal->creer)
 				$object->author    				= $user->id;			// deprecated
 				$object->note      				= GETPOST('note');
 				$object->statut    				= 0;
+				$object->titre    				= GETPOST('propale_title');
 
 				$id = $object->create_from($user);
 			}
@@ -365,6 +374,7 @@ else if ($action == 'add' && $user->rights->propal->creer)
 			$object->duree_validite 		= GETPOST('duree_validite');
 			$object->cond_reglement_id 		= GETPOST('cond_reglement_id');
 			$object->mode_reglement_id 		= GETPOST('mode_reglement_id');
+			$object->titre    				= GETPOST('propale_title');
 
 			$object->contactid  = GETPOST('contactidp');
 			$object->fk_project = GETPOST('projectid');
@@ -1410,6 +1420,11 @@ if ($action == 'create')
 		print '</td></tr>';
 	}
 
+	// Titre du devis
+	echo '<tr><td>'.$langs->trans('PropaleTitle').'</td><td colspan="2">';
+	echo '<input type="text" name="propale_title" value=""/>';
+	echo '</td></tr>';
+
 	// Date
 	print '<tr><td class="fieldrequired">'.$langs->trans('Date').'</td><td colspan="2">';
 	$form->select_date('','','','','',"addprop");
@@ -1759,7 +1774,48 @@ else
 	}
 	if (! $absolute_discount && ! $absolute_creditnote) print $langs->trans("CompanyHasNoAbsoluteDiscount").'.';
 	print '</td></tr>';
+	
+	
+	// Titre du devis
+	$edit_titre_action = 'titrepropale';
+	echo '<tr><td><table class="nobordernopadding" width="100%"><tbody><tr>';
+	echo '<td>'.$langs->trans('PropaleTitle').'</td>';
+	if ($action != $edit_titre_action AND $user->rights->propal->creer AND !empty($object->brouillon)) {
+		// On met un bouton d'edit
+		printf(
+			"<td align=\"right\"><a href=\"%s?action=%s&amp;id=%d\">%s</a></td>",
+			$_SERVER['PHP_SELF'],
+			$edit_titre_action,
+			intval($object->id),
+			img_edit($langs->trans('Modify'))
+		);
+	}
+	echo '</tr></tbody></table></td>';
+	
+	echo '<td colspan="5">';
+	if ($action == $edit_titre_action AND $user->rights->propal->creer) {
+		// Formulaire d'édition du titre
+		printf("
+			<form method=\"POST\" action=\"propal.php?id=%d\">
+				<input type=\"hidden\" name=\"token\" value=\"%s\"/>
+				<input type=\"hidden\" name=\"action\" value=\"%s\"/>
+				<input type=\"text\" name=\"propale_title\" value=\"%s\" class=\"flat\" size=\"50\"/>
+				<input type=\"submit\" value=\"%s\" class=\"button\"/>
+			</form>",
+			intval($object->id),
+			$_SESSION['newtoken'],
+			$set_title_devis_action,
+			htmlentities($object->titre),
+			$langs->trans('Modify')
+		);
+	}
+	else {
+		// On écrit juste le titre
+		echo htmlentities($object->titre);
+	}
+	echo '</td></tr>';
 
+	
 	// Date of proposal
 	print '<tr>';
 	print '<td>';
@@ -2447,4 +2503,3 @@ else
 // End of page
 llxFooter();
 $db->close();
-?>

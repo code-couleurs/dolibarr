@@ -95,6 +95,8 @@ class Propal extends CommonObject
     var $availability_code;
     var $demand_reason_id;
     var $demand_reason_code;
+	
+	var $titre;
 
     var $products=array();
     var $extraparams=array();
@@ -712,6 +714,7 @@ class Propal extends CommonObject
         $sql.= ", fk_input_reason";
         $sql.= ", fk_projet";
         $sql.= ", entity";
+        $sql.= ", titre";
         $sql.= ") ";
         $sql.= " VALUES (";
         $sql.= $this->socid;
@@ -737,6 +740,7 @@ class Propal extends CommonObject
         $sql.= ", ".$this->demand_reason_id;
         $sql.= ", ".($this->fk_project?$this->fk_project:"null");
         $sql.= ", ".$conf->entity;
+        $sql.= ", ".(is_null($this->titre) ? 'null' : "'".$this->db->escape($this->titre)."'");
         $sql.= ")";
 
         dol_syslog(get_class($this)."::create sql=".$sql, LOG_DEBUG);
@@ -1034,6 +1038,7 @@ class Propal extends CommonObject
         $sql.= ", p.fk_input_reason";
         $sql.= ", p.fk_cond_reglement";
         $sql.= ", p.fk_mode_reglement";
+        $sql.= ", p.titre";
         $sql.= ", c.label as statut_label";
         $sql.= ", ca.code as availability_code, ca.label as availability";
         $sql.= ", dr.code as demand_reason_code, dr.label as demand_reason";
@@ -1078,6 +1083,7 @@ class Propal extends CommonObject
                 $this->note_public          = $obj->note_public;
                 $this->statut               = $obj->fk_statut;
                 $this->statut_libelle       = $obj->statut_label;
+				$this->titre				= $obj->titre;
 
                 $this->datec                = $this->db->jdate($obj->datec); // TODO obsolete
                 $this->datev                = $this->db->jdate($obj->datev); // TODO obsolete
@@ -1541,6 +1547,43 @@ class Propal extends CommonObject
             {
                 $this->error=$this->db->error();
                 dol_syslog('Propale::set_ref_client Erreur '.$this->error.' - '.$sql);
+                return -2;
+            }
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    /**
+     * Set customer reference number
+     *
+     *  @param      User	$user			Object user that modify
+     *  @param      string	$new_titre		New title
+     *  @return     int						<0 if ko, >0 if ok
+     */
+    function set_titre($user, $new_titre)
+    {
+        if ($user->rights->propale->creer)
+        {
+            dol_syslog('Propale::set_titre this->id='.$this->id.', new_titre='.$new_titre);
+
+			$sql = sprintf(
+				"UPDATE %spropal SET titre = %s WHERE rowid = %d",
+				MAIN_DB_PREFIX,
+				empty($new_titre) ? 'NULL' : "'".$this->db->escape($new_titre)."'",
+				intval($this->id)
+			);
+            if ($this->db->query($sql) )
+            {
+                $this->titre = $new_titre;
+                return 1;
+            }
+            else
+            {
+                $this->error=$this->db->error();
+                dol_syslog('Propale::set_titre Erreur '.$this->error.' - '.$sql);
                 return -2;
             }
         }
@@ -2440,6 +2483,7 @@ class Propal extends CommonObject
         $this->demand_reason_code  = 'SRC_00';
         $this->note_public='This is a comment (public)';
         $this->note_private='This is a comment (private)';
+		$this->titre = '';
         // Lines
         $nbp = 5;
         $xnbp = 0;
@@ -3162,4 +3206,3 @@ class PropaleLigne  extends CommonObject
 
 }
 
-?>
