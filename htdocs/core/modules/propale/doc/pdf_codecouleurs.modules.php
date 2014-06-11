@@ -231,7 +231,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				}
 
 				$ubuntu = $this->get_ubuntu_font_array($outputlangs);
-				$pdf->SetFont($ubuntu['regular']);
+				$pdf->SetFont($ubuntu['regular']['normal']);
 				// Set path to the background PDF File
 				if (empty($conf->global->MAIN_DISABLE_FPDI) && ! empty($conf->global->MAIN_ADD_PDF_BACKGROUND))
 				{
@@ -267,7 +267,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				$pagenb++;
 				$current_tab_height = 0;
 				$this->_pagehead($pdf, $object, 1, $outputlangs, $hookmanager);
-				$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);
+				$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
 				$pdf->MultiCell(0, 3, '');		// Set interline to 3
 				$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 
@@ -280,7 +280,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 //				{
 //					$tab_top = 100;
 //
-//					$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);
+//					$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
 //					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($object->note_public), 0, 1);
 //					$nexY = $pdf->GetY();
 //					$height_note=$nexY-$tab_top;
@@ -297,7 +297,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				$tab_top = 100;
 				if (!empty($object->titre))
 				{
-					$pdf->SetFont($ubuntu['regular'],'', $default_font_size);
+					$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size);
 					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($object->titre), 0, 1);
 
 					$nexY = $pdf->GetY();
@@ -320,7 +320,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				for ($i = 0 ; $i < $nblignes ; $i++)
 				{
 					$curY = $nexY;
-					$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);   // Into loop to work with multipage
+					$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);   // Into loop to work with multipage
 					$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 
 					// On rajoute $tab_header_height à la topMargin pour éviter d'écrire quoi que ce soit dans le header récapitulatif.
@@ -361,7 +361,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 					$pdf->setTopMargin($this->marge_haute);
 					$pdf->setPageOrientation('', 1, 0);	// The only function to edit the bottom margin of current page to set it.
 
-					$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);   // On repositionne la police par defaut
+					$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);   // On repositionne la police par defaut
 
 
 					// Unit price before discount
@@ -594,7 +594,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 		$ubuntu = $this->get_ubuntu_font_array($outputlangs);
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
 
-		$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);
+		$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
 		$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 		$pdf->writeHTMLCell(
 			100, 4*$this->ONE_MORE_LINE, $this->posxdesc-1, $posy, dol_htmlentitiesbr($object->note_public),
@@ -636,12 +636,12 @@ class pdf_codecouleurs extends ModelePDFPropales
 		$ubuntu = $this->get_ubuntu_font_array($outputlangs);
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
 
-		$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);
+		$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
 
 		// If France, show VAT mention if not applicable
 		if ($this->emetteur->pays_code == 'FR' && $this->franchise == 1)
 		{
-			$pdf->SetFont($ubuntu['bold'],'B', $default_font_size - 2);
+			$pdf->SetFont($ubuntu['bold']['normal'],'B', $default_font_size - 2);
 			$pdf->SetXY($this->marge_gauche, $posy+1);
 			$pdf->MultiCell(100, 4, $outputlangs->transnoentities("VATIsNotUsedForInvoice"), 0, 'L', 0);
 
@@ -653,12 +653,12 @@ class pdf_codecouleurs extends ModelePDFPropales
 		// Show payments conditions
 		if (empty($conf->global->PROPALE_PDF_HIDE_PAYMENTTERMCOND) && ($object->cond_reglement_code || $object->cond_reglement))
 		{
-			$pdf->SetFont($ubuntu['bold'],'B', $default_font_size - 1);
+			$pdf->SetFont($ubuntu['bold']['normal'],'B', $default_font_size - 1);
 			$pdf->SetXY($this->marge_gauche, $posy+1);
 			$titre = $outputlangs->transnoentities("PaymentConditions").' :';
 			$pdf->MultiCell(80, 4, $titre, 0, 'L');
 
-			$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);
+			$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
 			$pdf->SetXY($posxval, $posy+1);
 			$lib_condition_paiement=$outputlangs->transnoentities("PaymentCondition".$object->cond_reglement_code)!=('PaymentCondition'.$object->cond_reglement_code)?$outputlangs->transnoentities("PaymentCondition".$object->cond_reglement_code):$outputlangs->convToOutputCharset($object->cond_reglement_doc);
 			$lib_condition_paiement=str_replace('\n',"\n",$lib_condition_paiement);
@@ -693,7 +693,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 		$text_height = $this->ONE_MORE_LINE -1;
 		$marguin = 1;
 		$tab2_hl = $text_height + 2*$marguin;
-		$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);
+		$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
 
 		// Tableau total
 		$col1x = 120; $col2x = 170;
@@ -938,13 +938,13 @@ class pdf_codecouleurs extends ModelePDFPropales
 		if (empty($hidetop))
 		{
 			$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
-			$pdf->SetFont($ubuntu['light'],'',$default_font_size - 2);
+			$pdf->SetFont($ubuntu['light']['normal'],'',$default_font_size - 2);
 			$titre = $outputlangs->transnoentities("AmountInCurrency",$outputlangs->transnoentitiesnoconv("Currency".$conf->currency));
 			$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top - $this->ONE_MORE_LINE);
 			$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
 		}
 
-		$pdf->SetFont($ubuntu['regular'],'',$default_font_size);
+		$pdf->SetFont($ubuntu['regular']['normal'],'',$default_font_size);
 		$pdf->SetTextColor($this->WHITE['r'],$this->WHITE['g'],$this->WHITE['b']);
 
 		// Tab header rectangle
@@ -1035,7 +1035,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 		}
 
 		$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
-		$pdf->SetFont($ubuntu['bold'],'B', $default_font_size);
+		$pdf->SetFont($ubuntu['bold']['normal'],'B', $default_font_size);
 
 		$posy=$this->marge_haute;
 		$posx=$this->page_largeur-$this->marge_droite-100;
@@ -1054,7 +1054,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 			else
 			{
 				$pdf->SetTextColor(200,0,0);
-				$pdf->SetFont($ubuntu['bold'],'B',$default_font_size - 2);
+				$pdf->SetFont($ubuntu['bold']['normal'],'B',$default_font_size - 2);
 				$pdf->MultiCell(100, 3, $outputlangs->transnoentities("ErrorLogoFileNotFound",$logo), 0, 'L');
 				$pdf->MultiCell(100, 3, $outputlangs->transnoentities("ErrorGoToGlobalSetup"), 0, 'L');
 			}
@@ -1065,20 +1065,20 @@ class pdf_codecouleurs extends ModelePDFPropales
 			$pdf->MultiCell(100, 4, $outputlangs->convToOutputCharset($text), 0, 'L');
 		}
 
-		$pdf->SetFont($ubuntu['bold'], 'B', $default_font_size);
+		$pdf->SetFont($ubuntu['bold']['normal'], 'B', $default_font_size);
 		$pdf->SetXY($posx,$posy);
 		$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 		$title=$outputlangs->transnoentities("CommercialProposal");
 		$pdf->MultiCell(100, 4, $title, '', 'R');
 
-		$pdf->SetFont($ubuntu['bold']);
+		$pdf->SetFont($ubuntu['bold']['normal']);
 
 		$posy+=$this->ONE_MORE_LINE;
 		$pdf->SetXY($posx,$posy);
 		$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 		$pdf->MultiCell(100, 4, $outputlangs->transnoentities("Ref")." : " . $outputlangs->convToOutputCharset($object->ref), '', 'R');
 
-		$pdf->SetFont($ubuntu['regular']);
+		$pdf->SetFont($ubuntu['regular']['normal']);
 
 		if ($object->ref_client)
 		{
@@ -1134,7 +1134,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 			// Show sender frame
 			$pdf->SetTextColor($this->CC_PINK['r'],$this->CC_PINK['g'],$this->CC_PINK['b']);
-			$pdf->SetFont($ubuntu['regular'],'', $default_font_size);
+			$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size);
 			$pdf->SetXY($posx,$posy-5);
 			$pdf->MultiCell(66,5, $outputlangs->transnoentities("BillFrom"), 0, 'L');
 			$pdf->SetXY($posx,$posy);
@@ -1143,13 +1143,13 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 			// Show sender name
 			$pdf->SetXY($posx+2,$posy+3);
-			$pdf->SetFont($ubuntu['bold'],'B', $default_font_size);
+			$pdf->SetFont($ubuntu['bold']['normal'],'B', $default_font_size);
 			$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 			$pdf->MultiCell(80, 4, $outputlangs->convToOutputCharset($this->emetteur->name), 0, 'L');
 
 			// Show sender information
 			$pdf->SetXY($posx+2,$posy+8);
-			$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);
+			$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
 			$pdf->MultiCell(80, 4, $carac_emetteur, 0, 'L');
 
 
@@ -1186,7 +1186,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 			// Show recipient frame
 			$pdf->SetTextColor($this->CC_PINK['r'],$this->CC_PINK['g'],$this->CC_PINK['b']);
-			$pdf->SetFont($ubuntu['regular'],'', $default_font_size);
+			$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size);
 			$pdf->SetXY($posx,$posy-5);
 			$pdf->MultiCell($widthrecbox, 5, $outputlangs->transnoentities("BillTo"), 0, 'L');
 			$pdf->Rect($posx, $posy, $widthrecbox, $hautcadre);
@@ -1194,11 +1194,11 @@ class pdf_codecouleurs extends ModelePDFPropales
 			// Show recipient name
 			$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 			$pdf->SetXY($posx+2,$posy+3);
-			$pdf->SetFont($ubuntu['bold'],'B', $default_font_size);
+			$pdf->SetFont($ubuntu['bold']['normal'],'B', $default_font_size);
 			$pdf->MultiCell($widthrecbox, 4, $carac_client_name, 0, 'L');
 
 			// Show recipient information
-			$pdf->SetFont($ubuntu['regular'],'', $default_font_size);
+			$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size);
 			$pdf->SetXY($posx+2,$posy+4+(dol_nboflines_bis($carac_client_name,50)*4));
 			$pdf->MultiCell($widthrecbox, 4, $carac_client, 0, 'L');
 		}
@@ -1362,7 +1362,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 		}
 		$line4 = implode(' - ', $line4);
 
-		$pdf->SetFont($ubuntu['bold'],'', $default_font_size);
+		$pdf->SetFont($ubuntu['bold']['normal'],'', $default_font_size);
 		$pdf->SetTextColor($this->CC_DARK_GREY['r'], $this->CC_DARK_GREY['g'], $this->CC_DARK_GREY['b']);
 		$pdf->SetDrawColor($this->CC_DARK_GREY['r'], $this->CC_DARK_GREY['g'], $this->CC_DARK_GREY['b']);
 
@@ -1395,7 +1395,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 		
 		if (!empty($line1))
 		{
-			$pdf->SetFont($ubuntu['bold'],'', $default_font_size);
+			$pdf->SetFont($ubuntu['bold']['normal'],'', $default_font_size);
 			$pdf->SetXY($dims['lm'],-$posy);
 			$pdf->MultiCell(200, 2, $line1, 0, 'C', 0);
 			$posy -= $this->ONE_MORE_LINE;
@@ -1404,7 +1404,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 		if (!empty($line2))
 		{
-			$pdf->SetFont($ubuntu['bold'],'', $default_font_size);
+			$pdf->SetFont($ubuntu['bold']['normal'],'', $default_font_size);
 			$pdf->SetXY($dims['lm'],-$posy);
 			$pdf->MultiCell(200, 2, $line2, 0, 'C', 0);
 			$posy -= $this->ONE_MORE_LINE;
@@ -1436,7 +1436,9 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 	/**
 	 * Array with Ubuntu fonts names
-	 * @return array
+	 * @return array Array whose indexes are the different emphasis (light,
+	 * medium, regular, bold) and whose values are arrays containing the normal
+	 * and italic fonts of the emphasis.
 	 */
 	function get_ubuntu_font_array($outputlangs) {
 		if (!is_object($outputlangs)){
@@ -1446,10 +1448,20 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 		$outputlangs->load("main");
 		$ubuntu_font_family = pdf_getPDFFont($outputlangs);
-		return array(
-			'regular' => $ubuntu_font_family,
-			'bold' => $ubuntu_font_family.'_bold',
-			'light' => $ubuntu_font_family.'_light'
-		);			
+		
+		$ubuntu = array();
+		foreach (array('light', 'medium', 'regular', 'bold') as $graisse) {
+			!isset($ubuntu[$graisse]) AND ($ubuntu[$graisse] = array());
+			
+			$nom = array($ubuntu_font_family);
+			($graisse != 'regular') AND ($nom[] = $graisse);
+			
+			foreach (array('normal', 'italic') as $graphie) {
+				($graphie != 'normal') AND ($nom[] = $graphie);
+				$ubuntu[$graisse][$graphie] = implode('_', $nom);
+			}
+		}
+		
+		return $ubuntu;
 	}
 }
