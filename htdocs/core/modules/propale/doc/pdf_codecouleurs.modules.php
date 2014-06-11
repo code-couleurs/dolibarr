@@ -292,8 +292,25 @@ class pdf_codecouleurs extends ModelePDFPropales
 				{
 					$height_note=0;
 				}
-
+				
+				// Affiche le titre du devis
 				$tab_top = 116;
+				if (!empty($object->titre))
+				{
+					$pdf->SetFont($ubuntu['bold'],'', $default_font_size);
+					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($object->titre), 0, 1);
+
+					$nexY = $pdf->GetY();
+					$height_note=$nexY-$tab_top;
+
+					$tab_height = $tab_height - $height_note;
+					$tab_top = $nexY+9 + $height_note;
+				}
+				else
+				{
+					$height_note=0;
+				}
+
 				$iniY = $tab_top + 7;
 				$curY = $tab_top + 7;
 				$nexY = $tab_top + 7;
