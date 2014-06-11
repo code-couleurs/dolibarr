@@ -275,29 +275,29 @@ class pdf_codecouleurs extends ModelePDFPropales
 				$tab_height = 130;
 				$tab_height_newpage = 150;
 
-				// Affiche notes
-				if (!empty($object->note_public))
-				{
-					$tab_top = 100;
-
-					$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);
-					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($object->note_public), 0, 1);
-					$nexY = $pdf->GetY();
-					$height_note=$nexY-$tab_top;
-
-					$tab_height = $tab_height - $height_note;
-					$tab_top = $nexY+9 + $height_note;
-				}
-				else
-				{
-					$height_note=0;
-				}
+//				// Affiche notes
+//				if (!empty($object->note_public))
+//				{
+//					$tab_top = 100;
+//
+//					$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);
+//					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($object->note_public), 0, 1);
+//					$nexY = $pdf->GetY();
+//					$height_note=$nexY-$tab_top;
+//
+//					$tab_height = $tab_height - $height_note;
+//					$tab_top = $nexY+9 + $height_note;
+//				}
+//				else
+//				{
+//					$height_note=0;
+//				}
 				
 				// Affiche le titre du devis
-				$tab_top = 116;
+				$tab_top = 100;
 				if (!empty($object->titre))
 				{
-					$pdf->SetFont($ubuntu['bold'],'', $default_font_size);
+					$pdf->SetFont($ubuntu['regular'],'', $default_font_size);
 					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($object->titre), 0, 1);
 
 					$nexY = $pdf->GetY();
@@ -484,7 +484,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				$bottom_max = $this->page_hauteur - $heightforfreetext - $heightforfooter + 1;
 				
 				if ($end_tab_y + $this->ONE_MORE_LINE > $bottom_max) {
-					// Pas de place pour les totaux, on ajoute une page pour les écrire à la page suivante
+					// Pas de place pour les totaux, les infos et les mentions client, on ajoute une page pour les écrire à la page suivante
 					$pdf->AddPage();
 					if (!empty($tplidx)) {
 						$pdf->useTemplate($tplidx);
@@ -492,7 +492,6 @@ class pdf_codecouleurs extends ModelePDFPropales
 					if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) {
 						$this->_pagehead($pdf, $object, 0, $outputlangs, $hookmanager);
 					}
-					$pdf->setPage($pagenb+1);
 					$bottomlasttab = $this->FIRST_AFTER_HEADER;	// Haut de la page en +
 				}
 				else {
@@ -500,11 +499,25 @@ class pdf_codecouleurs extends ModelePDFPropales
 					$bottomlasttab = min($end_tab_y + $space_tab_tot, $bottom_max);
 				}
 				
-				// Affiche zone infos
-				$posy=$this->_tableau_info($pdf, $object, $bottomlasttab, $outputlangs);
-
-				// Affiche zone totaux
-				$posy=$this->_tableau_tot($pdf, $object, 0, $bottomlasttab, $outputlangs);
+				$pdf->startTransaction();
+				$posy = $this->_notes_post_tableau($pdf, $object, $bottomlasttab, $outputlangs);
+				
+				if ($posy > $bottom_max) {
+					// Pas de place en bas de la page, on réécrit en haut de la suivante.
+					$pdf->rollbackTransaction(true);
+					
+					$pdf->AddPage();
+					if (!empty($tplidx)) {
+						$pdf->useTemplate($tplidx);
+					}
+					if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) {
+						$this->_pagehead($pdf, $object, 0, $outputlangs, $hookmanager);
+					}
+					$posy = $this->_notes_post_tableau($pdf, $object, $this->FIRST_AFTER_HEADER, $outputlangs);
+				}
+				else {
+					$pdf->commitTransaction();
+				}
 
 				// Pied de page
 				for ($page = 1; $page <= $pdf->getNumPages(); $page++) {
@@ -548,6 +561,48 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 		$this->error=$langs->trans("ErrorUnknown");
 		return 0;   // Erreur par defaut
+	}
+	
+	function _notes_post_tableau(&$pdf, $object, $posy, $outputlangs) {
+		// Affiche zone infos
+		$posy_gauche=$this->_tableau_info($pdf, $object, $posy, $outputlangs);
+		$posy_gauche=$this->_affichage_notes_et_mentions($pdf, $object, $posy_gauche, $outputlangs);
+
+		// Affiche zone totaux
+		$posy_droit=$this->_tableau_tot($pdf, $object, 0, $posy, $outputlangs);
+		
+		return max($posy_gauche, $posy_droit);
+	}
+	
+	/**
+	 * Affichage des notes publiques et des mentions liées aux clients
+	 *   @param		PDF			&$pdf     		Object PDF
+	 *   @param		Object		$object			Object to show
+	 *   @param		int			$posy			Y
+	 *   @param		Translate	$outputlangs	Langs object
+	 *   @return	int			New Y
+	 */
+	function _affichage_notes_et_mentions(&$pdf, $object, $posy, $outputlangs) {
+		// Le contenu est affiché dans les notes publiques
+		
+		// Pas de notes : on ne fait rien.
+		if ($object->note_public === '')
+		{
+			return $posy;
+		}
+		
+		$ubuntu = $this->get_ubuntu_font_array($outputlangs);
+		$default_font_size = pdf_getPDFFontSize($outputlangs);
+
+		$pdf->SetFont($ubuntu['regular'],'', $default_font_size - 1);
+		$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
+		$pdf->writeHTMLCell(
+			100, 4*$this->ONE_MORE_LINE, $this->posxdesc-1, $posy, dol_htmlentitiesbr($object->note_public),
+			0, 1);
+		$nexY = $pdf->GetY();
+		$height_note=$nexY-$posy;
+		$posy = $nexY+9 + $height_note;
+		return $posy;
 	}
 
 	/**

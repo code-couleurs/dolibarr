@@ -7,3 +7,6 @@
 
 -- Un titre pour le devis (#1000)
 ALTER TABLE `llx_propal` ADD COLUMN `titre` VARCHAR(128) DEFAULT NULL;
+
+-- Des mentions spécifiques pour le client (#1001)
+--ALTER TABLE `llx_propal` ADD COLUMN `mentions_client` VARCHAR(65536) DEFAULT NULL;

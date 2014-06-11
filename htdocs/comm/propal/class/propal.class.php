@@ -86,7 +86,7 @@ class Propal extends CommonObject
     var $remise_absolue;
     var $note;						// deprecated (for compatibility)
     var $note_private;
-    var $note_public;
+    var $note_public;				// Servent aussi pour les mentions clients (#1001 sur Redmine)
     var $fk_delivery_address;		// deprecated (for compatibility)
     var $fk_address;
     var $address_type;
