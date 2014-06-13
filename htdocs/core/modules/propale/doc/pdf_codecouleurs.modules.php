@@ -62,13 +62,18 @@ class pdf_codecouleurs extends ModelePDFPropales
 	);
 	var $CC_LIGHT_GREY = array(
 		'r' => 0xDE,
-		'g' => 0xE4,
+		'g' => 0xE3,
 		'b' => 0xE6
 	);
 	var $CC_DARK_GREY = array(
 		'r' => 0x81,
 		'g' => 0x91,
 		'b' => 0x9A
+	);
+	var $CC_GREY_WRITE = array(
+		'r' => 0x6F,
+		'g' => 0x74,
+		'b' => 0x79
 	);
 	var $BLACK = array(
 		'r' => 0x0,
@@ -231,7 +236,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				}
 
 				$ubuntu = $this->get_ubuntu_font_array($outputlangs);
-				$pdf->SetFont($ubuntu['regular']['normal']);
+				$pdf->SetFont($ubuntu['light']['normal']);
 				// Set path to the background PDF File
 				if (empty($conf->global->MAIN_DISABLE_FPDI) && ! empty($conf->global->MAIN_ADD_PDF_BACKGROUND))
 				{
@@ -267,40 +272,21 @@ class pdf_codecouleurs extends ModelePDFPropales
 				$pagenb++;
 				$current_tab_height = 0;
 				$this->_pagehead($pdf, $object, 1, $outputlangs, $hookmanager);
-				$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
+				$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 1);
 				$pdf->MultiCell(0, 3, '');		// Set interline to 3
 				$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 
 				$tab_top_newpage = (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)?42:10);
 				$tab_height = 130;
-				$tab_height_newpage = 150;
-
-//				// Affiche notes
-//				if (!empty($object->note_public))
-//				{
-//					$tab_top = 100;
-//
-//					$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
-//					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($object->note_public), 0, 1);
-//					$nexY = $pdf->GetY();
-//					$height_note=$nexY-$tab_top;
-//
-//					$tab_height = $tab_height - $height_note;
-//					$tab_top = $nexY+9 + $height_note;
-//				}
-//				else
-//				{
-//					$height_note=0;
-//				}
 				
 				// Affiche le titre du devis
-				$tab_top = 100;
+				$tab_top = 105;
 				if (!empty($object->titre))
 				{
-					$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size);
-					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($object->titre), 0, 1);
+					$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
+					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top + 5, dol_htmlentitiesbr($object->titre), 0, 1);
 
-					$nexY = $pdf->GetY();
+					$nexY = $pdf->GetY() - 5;
 					$height_note=$nexY-$tab_top;
 
 					$tab_height = $tab_height - $height_note;
@@ -320,7 +306,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				for ($i = 0 ; $i < $nblignes ; $i++)
 				{
 					$curY = $nexY;
-					$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);   // Into loop to work with multipage
+					$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 1);   // Into loop to work with multipage
 					$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 
 					// On rajoute $tab_header_height à la topMargin pour éviter d'écrire quoi que ce soit dans le header récapitulatif.
@@ -334,7 +320,8 @@ class pdf_codecouleurs extends ModelePDFPropales
 					$showpricebeforepagebreak=1;
 
 					$pdf->startTransaction();
-					pdf_writelinedesc($pdf,$object,$i,$outputlangs,$this->posxup-$curX,3,$curX,$curY,$hideref,$hidedesc,0,$hookmanager);
+					$this->pdf_writelinedesc($pdf, $object, $i, $this->posxup-$curX, $curY, $outputlangs);
+					//pdf_writelinedesc($pdf,$object,$i,$outputlangs,$this->posxup-$curX,3,$curX,$curY,$hideref,$hidedesc,0,$hookmanager);
 					$pageposafter=$pdf->getPage();
 					if ($pageposafter > $pageposbefore)	// There is a pagebreak
 					{
@@ -346,7 +333,8 @@ class pdf_codecouleurs extends ModelePDFPropales
 						
 						$pageposafter=$pageposbefore;
 						$pdf->setPageOrientation('', 1, $heightforfooter);	// The only function to edit the bottom margin of current page to set it.
-						pdf_writelinedesc($pdf,$object,$i,$outputlangs,$this->posxtva-$curX,4,$curX,$curY,$hideref,$hidedesc,0,$hookmanager);
+						$this->pdf_writelinedesc($pdf, $object, $i, $this->posxup-$curX, $curY, $outputlangs);
+						//pdf_writelinedesc($pdf,$object,$i,$outputlangs,$this->posxtva-$curX,4,$curX,$curY,$hideref,$hidedesc,0,$hookmanager);
 						$pageposafter=$pdf->getPage();
 						$posyafter=$pdf->GetY();
 					}
@@ -361,15 +349,15 @@ class pdf_codecouleurs extends ModelePDFPropales
 					$pdf->setTopMargin($this->marge_haute);
 					$pdf->setPageOrientation('', 1, 0);	// The only function to edit the bottom margin of current page to set it.
 
-					$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);   // On repositionne la police par defaut
+					$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 1);   // On repositionne la police par defaut
 
 
-					// Unit price before discount
+					// Price without VAT before discount
 					if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT))
 					{
 						$pdf->SetXY($this->posxup, $curY);
-						$up_excl_tax = pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails, $hookmanager);
-						$pdf->MultiCell($this->posxup-$this->posxtva-1, 3, $up_excl_tax, 0, 'R');
+						$up_excl_tax = floatval(pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails, $hookmanager)*pdf_getlineqty($object,$i,$outputlangs,$hidedetails));
+						$pdf->MultiCell($this->posxup-$this->posxtva-1, 3, price($up_excl_tax), 0, 'R');
 					}
 
 					// VAT Amount
@@ -563,6 +551,56 @@ class pdf_codecouleurs extends ModelePDFPropales
 		return 0;   // Erreur par defaut
 	}
 	
+	/**
+	 * Écrire la désignation. Cette méthode est utilisée en lieu et place de la
+	 * fonction pdf_writelinedesc(); de Dolibarr car cette dernière ne permet pas
+	 * d'avoir le rendu souhaité.
+	 * @param PDF $pdf
+	 * @param Propal $object The propale
+	 * @param int $w Column width
+	 * @param int $posy Y
+	 * @param mixed $outputlangs Lang manager
+	 */
+	function pdf_writelinedesc(&$pdf, $object, $i, $w, $posy, $outputlangs) {
+		global $langs;
+
+		if (!is_object($outputlangs)) {
+			$outputlangs = $langs;
+		}
+		
+		$ubuntu = $this->get_ubuntu_font_array($outputlangs);
+		$default_size = pdf_getPDFFontSize($outputlangs);
+		
+		$description = trim($object->lines[$i]->desc);
+		$retrait = 4;
+		
+		// Extraire la prmière ligne
+		$ligne1 = trim(html_entity_decode(strtok(htmlentities($description), "\n")));
+		
+		// Écrire la première ligne
+		$pdf->SetFont($ubuntu['regular']['normal'], '', $default_size - 1);
+		$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
+		$pdf->writeHTMLCell($w, $this->ONE_MORE_LINE, $this->posxdesc-1, $posy, dol_htmlentitiesbr($ligne1), 0, 1);
+		
+		// Avoir le reste du texte
+		if ($description != $ligne1) {
+			$regex_debut = "/".preg_quote(html_entity_decode($ligne1), '/')."/A";
+			$reste = trim(preg_replace($regex_debut, '', $description, 1));
+
+			// Écrire le reste du texte
+			$pdf->SetFont($ubuntu['light']['normal'], '', $default_size - 2);
+			$pdf->SetTextColor($this->CC_GREY_WRITE['r'],$this->CC_GREY_WRITE['g'],$this->CC_GREY_WRITE['b']);
+			$pdf->writeHTMLCell(
+				$w - $retrait, $this->ONE_MORE_LINE, $this->posxdesc-1 + $retrait, $pdf->GetY() + 1,
+				dol_htmlentitiesbr($reste),
+				0, 1
+			);
+
+			$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
+		}
+		return $pdf->GetY();
+	}
+		
 	function _notes_post_tableau(&$pdf, $object, $posy, $outputlangs) {
 		// Affiche zone infos
 		$posy_gauche=$this->_tableau_info($pdf, $object, $posy, $outputlangs);
@@ -586,18 +624,19 @@ class pdf_codecouleurs extends ModelePDFPropales
 		// Le contenu est affiché dans les notes publiques
 		
 		// Pas de notes : on ne fait rien.
-		if ($object->note_public === '')
-		{
+		if ($object->note_public === '') {
 			return $posy;
 		}
+		
+		$col_width = 110 - $this->marge_gauche;
 		
 		$ubuntu = $this->get_ubuntu_font_array($outputlangs);
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
 
-		$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
+		$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 2);
 		$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 		$pdf->writeHTMLCell(
-			100, 4*$this->ONE_MORE_LINE, $this->posxdesc-1, $posy, dol_htmlentitiesbr($object->note_public),
+			$col_width, $this->ONE_MORE_LINE, $this->posxdesc-1, $posy, dol_htmlentitiesbr($object->note_public),
 			0, 1);
 		$nexY = $pdf->GetY();
 		$height_note=$nexY-$posy;
@@ -614,10 +653,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 	 *  @param  Translate	$outputlangs    Object langs for output
 	 *  @return int             			<0 if KO, >0 if OK
 	 */
-	function _tableau_versements(&$pdf, $object, $posy, $outputlangs)
-	{
-
-	}
+	function _tableau_versements(&$pdf, $object, $posy, $outputlangs) {}
 
 
 	/**
@@ -636,14 +672,16 @@ class pdf_codecouleurs extends ModelePDFPropales
 		$ubuntu = $this->get_ubuntu_font_array($outputlangs);
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
 
-		$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
+		$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 1);
+		
+		$col_width = 110 - $this->marge_gauche;
 
 		// If France, show VAT mention if not applicable
 		if ($this->emetteur->pays_code == 'FR' && $this->franchise == 1)
 		{
 			$pdf->SetFont($ubuntu['bold']['normal'],'B', $default_font_size - 2);
 			$pdf->SetXY($this->marge_gauche, $posy+1);
-			$pdf->MultiCell(100, 4, $outputlangs->transnoentities("VATIsNotUsedForInvoice"), 0, 'L', 0);
+			$pdf->MultiCell($col_width, 4, $outputlangs->transnoentities("VATIsNotUsedForInvoice"), 0, 'L', 0);
 
 			$posy=$pdf->GetY()+6;
 		}
@@ -653,17 +691,17 @@ class pdf_codecouleurs extends ModelePDFPropales
 		// Show payments conditions
 		if (empty($conf->global->PROPALE_PDF_HIDE_PAYMENTTERMCOND) && ($object->cond_reglement_code || $object->cond_reglement))
 		{
-			$pdf->SetFont($ubuntu['bold']['normal'],'B', $default_font_size - 1);
+			$pdf->SetFont($ubuntu['medium']['normal'],'B', $default_font_size - 1);
 			$pdf->SetXY($this->marge_gauche, $posy+1);
 			$titre = $outputlangs->transnoentities("PaymentConditions").' :';
-			$pdf->MultiCell(80, 4, $titre, 0, 'L');
+			$pdf->MultiCell($col_width, $this->ONE_MORE_LINE, $titre, 0, 'L');
 
-			$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
-			$pdf->SetXY($posxval, $posy+1);
+			$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 1);
+			$pdf->SetXY($this->marge_gauche + 10, $posy + $this->ONE_MORE_LINE +1);
 			$lib_condition_paiement=$outputlangs->transnoentities("PaymentCondition".$object->cond_reglement_code)!=('PaymentCondition'.$object->cond_reglement_code)?$outputlangs->transnoentities("PaymentCondition".$object->cond_reglement_code):$outputlangs->convToOutputCharset($object->cond_reglement_doc);
 			$lib_condition_paiement=str_replace('\n',"\n",$lib_condition_paiement);
 			$lib_condition_paiement = "acompte de 30% à la signature du devis";
-			$pdf->MultiCell(80, 4, $lib_condition_paiement,0,'L');
+			$pdf->MultiCell($col_width - 10, $this->ONE_MORE_LINE, $lib_condition_paiement,0,'L');
 
 			$posy = $pdf->GetY() + 6;
 		}
@@ -880,9 +918,11 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 			$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 		}
+		
+		$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 1);
 
 		$cur_posy += $tab2_hl;
-		return $tab2_top + $cur_posy;
+		return $cur_posy;
 	}
 	
 	/**
@@ -940,7 +980,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 			$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 			$pdf->SetFont($ubuntu['light']['normal'],'',$default_font_size - 2);
 			$titre = $outputlangs->transnoentities("AmountInCurrency",$outputlangs->transnoentitiesnoconv("Currency".$conf->currency));
-			$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top - $this->ONE_MORE_LINE);
+			$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top - $this->ONE_MORE_LINE -1);
 			$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
 		}
 
@@ -1078,7 +1118,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 		$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 		$pdf->MultiCell(100, 4, $outputlangs->transnoentities("Ref")." : " . $outputlangs->convToOutputCharset($object->ref), '', 'R');
 
-		$pdf->SetFont($ubuntu['regular']['normal']);
+		$pdf->SetFont($ubuntu['light']['normal']);
 
 		if ($object->ref_client)
 		{
@@ -1114,18 +1154,23 @@ class pdf_codecouleurs extends ModelePDFPropales
 		if ($showaddress)
 		{
 			$address_boxes_posy = $this->FIRST_AFTER_HEADER;
+			$retrait_cadre = 3;
 			// Sender properties
-			$carac_emetteur='';
+			
 			// Add internal contact of proposal if defined
 			$arrayidcontact=$object->getIdContact('internal','SALESREPFOLL');
 			if (count($arrayidcontact) > 0)
 			{
 				$object->fetch_user($arrayidcontact[0]);
-				$carac_emetteur .= ($carac_emetteur ? "\n" : '' ).$outputlangs->transnoentities("Name").": ".$outputlangs->convToOutputCharset($object->user->getFullName($outputlangs))."\n";
+				$contact_emetteur = $object->user;
+			}
+			else {
+				$contact_emetteur = null;
 			}
 
-			$carac_emetteur .= pdf_build_address($outputlangs,$this->emetteur);
-
+			//$carac_emetteur .= pdf_build_address($outputlangs,$this->emetteur);
+			$carac_emetteur = $this->pdf_build_address($outputlangs, $this->emetteur, $contact_emetteur, 'internal');
+			
 			// Show sender
 			$posy=$address_boxes_posy;
 			$posx=$this->marge_gauche;
@@ -1135,21 +1180,21 @@ class pdf_codecouleurs extends ModelePDFPropales
 			// Show sender frame
 			$pdf->SetTextColor($this->CC_PINK['r'],$this->CC_PINK['g'],$this->CC_PINK['b']);
 			$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size);
-			$pdf->SetXY($posx,$posy-5);
+			$pdf->SetXY($posx,$posy-6);
 			$pdf->MultiCell(66,5, $outputlangs->transnoentities("BillFrom"), 0, 'L');
 			$pdf->SetXY($posx,$posy);
 			$pdf->SetFillColor($this->CC_LIGHT_GREY['r'],$this->CC_LIGHT_GREY['g'],$this->CC_LIGHT_GREY['b']);
 			$pdf->MultiCell(82, $hautcadre, "", 0, 'R', 1);
 
 			// Show sender name
-			$pdf->SetXY($posx+2,$posy+3);
+			$pdf->SetXY($posx+$retrait_cadre,$posy+3);
 			$pdf->SetFont($ubuntu['bold']['normal'],'B', $default_font_size);
 			$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
 			$pdf->MultiCell(80, 4, $outputlangs->convToOutputCharset($this->emetteur->name), 0, 'L');
 
 			// Show sender information
-			$pdf->SetXY($posx+2,$posy+8);
-			$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
+			$pdf->SetXY($posx+$retrait_cadre,$posy+10);
+			$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size);
 			$pdf->MultiCell(80, 4, $carac_emetteur, 0, 'L');
 
 
@@ -1160,6 +1205,10 @@ class pdf_codecouleurs extends ModelePDFPropales
 			{
 				$usecontact=true;
 				$result=$object->fetch_contact($arrayidcontact[0]);
+				$contact_client = $object->contact;
+			}
+			else {
+				$contact_client = null;
 			}
 
 			// Recipient name
@@ -1175,7 +1224,8 @@ class pdf_codecouleurs extends ModelePDFPropales
 				$carac_client_name=$outputlangs->convToOutputCharset($object->client->nom);
 			}
 
-			$carac_client=pdf_build_address($outputlangs,$this->emetteur,$object->client,($usecontact?$object->contact:''),$usecontact,'target');
+			//$carac_client=pdf_build_address($outputlangs,$this->emetteur,$object->client,($usecontact?$object->contact:''),$usecontact,'target');
+			$carac_client = $this->pdf_build_address($outputlangs, $object->client, $contact_client, 'external');
 
 			// Show recipient
 			$widthrecbox=100;
@@ -1187,21 +1237,95 @@ class pdf_codecouleurs extends ModelePDFPropales
 			// Show recipient frame
 			$pdf->SetTextColor($this->CC_PINK['r'],$this->CC_PINK['g'],$this->CC_PINK['b']);
 			$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size);
-			$pdf->SetXY($posx,$posy-5);
+			$pdf->SetXY($posx,$posy-6);
 			$pdf->MultiCell($widthrecbox, 5, $outputlangs->transnoentities("BillTo"), 0, 'L');
 			$pdf->Rect($posx, $posy, $widthrecbox, $hautcadre);
 
 			// Show recipient name
 			$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
-			$pdf->SetXY($posx+2,$posy+3);
+			$pdf->SetXY($posx+$retrait_cadre,$posy+3);
 			$pdf->SetFont($ubuntu['bold']['normal'],'B', $default_font_size);
 			$pdf->MultiCell($widthrecbox, 4, $carac_client_name, 0, 'L');
 
 			// Show recipient information
-			$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size);
-			$pdf->SetXY($posx+2,$posy+4+(dol_nboflines_bis($carac_client_name,50)*4));
+			$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size);
+			$pdf->SetXY($posx+$retrait_cadre,$posy+6+(dol_nboflines_bis($carac_client_name,50)*4));
 			$pdf->MultiCell($widthrecbox, 4, $carac_client, 0, 'L');
 		}
+	}
+	
+	/**
+	 * Construire une adresse pour le header
+	 * @param type $outputlangs Gestionnaire de langues
+	 * @param type $company L'entreprise de l'adresse
+	 * @param mixed $contact Le contact
+	 * @param type $source_contact Source du contact : 'internal' pour l'émetteur
+	 * et 'external' pour le client.
+	 * @return type L'adresse construite et prête à être insérée dans le PDF.
+	 */
+	function pdf_build_address($outputlangs, $company, $contact, $source_contact) {
+		if (!is_object($outputlangs)) {
+			global $langs;
+			$outputlangs = $langs;
+		}
+		
+		$adresse = array();
+		
+		// Adresse de la société
+		$adresse[] = $outputlangs->convToOutputCharset(dol_format_address($company));
+		
+		// Coordonnées du contact
+		if (is_object($contact)) {
+			$adresse_contact = array();
+			
+			// Identité
+			$identite = array();
+			if (!empty($contact->civilite)) {
+				$identite[] = $contact->getCivilityLabel();
+			}
+			if (!empty($contact->firstname)) {
+				$identite[] = ucfirst($contact->firstname);
+			}
+			if (!empty($contact->lastname)) {
+				$identite[] = ucfirst($contact->lastname);
+			}
+			$identite = implode(' ', $identite);
+			if (!empty($identite)) {
+				$adresse_contact[] = $identite;
+			}
+			
+			// N°s de téléphone
+			$tels = array();
+			if ($source_contact == 'internal') {
+				$pro = 'office_phone';
+				$mobile = 'user_mobile';
+			}
+			else {
+				$pro = 'phone_perso';
+				$mobile = 'phone_mobile';
+			}
+			if (!empty($contact->$pro)) {
+				$tels[] = $contact->$pro;
+			}
+			if (!empty($contact->$mobile)) {
+				$tels[] = $contact->$mobile;
+			}
+			$tels = implode(' | ', $tels);
+			if (!empty($tels)) {
+				$adresse_contact[] = $tels;
+			}
+			
+			// Courriel entreprise
+			$adresse_contact[] = $company->email;
+			
+			// Ajout à l'adresse finale
+			$adresse_contact = implode("\n", $adresse_contact);
+			if (!empty($adresse_contact)) {
+				$adresse[] = $adresse_contact;
+			}
+		}
+		
+		return implode("\n\n", $adresse);
 	}
 
 	/**
