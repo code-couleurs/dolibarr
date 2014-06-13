@@ -283,7 +283,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				$tab_top = 105;
 				if (!empty($object->titre))
 				{
-					$pdf->SetFont($ubuntu['regular']['normal'],'', $default_font_size - 1);
+					$pdf->SetFont($ubuntu['medium']['normal'],'', $default_font_size - 1);
 					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top + 5, dol_htmlentitiesbr($object->titre), 0, 1);
 
 					$nexY = $pdf->GetY() - 5;
@@ -710,11 +710,11 @@ class pdf_codecouleurs extends ModelePDFPropales
 			$pdf->MultiCell($col_width, $this->ONE_MORE_LINE, $titre, 0, 'L');
 
 			$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 1);
-			$pdf->SetXY($this->marge_gauche + 10, $posy + $this->ONE_MORE_LINE +1);
+			$pdf->SetXY($this->marge_gauche, $posy + $this->ONE_MORE_LINE +1);
 			$lib_condition_paiement=$outputlangs->transnoentities("PaymentCondition".$object->cond_reglement_code)!=('PaymentCondition'.$object->cond_reglement_code)?$outputlangs->transnoentities("PaymentCondition".$object->cond_reglement_code):$outputlangs->convToOutputCharset($object->cond_reglement_doc);
 			$lib_condition_paiement=str_replace('\n',"\n",$lib_condition_paiement);
 			$lib_condition_paiement = "acompte de 30% à la signature du devis";
-			$pdf->MultiCell($col_width - 10, $this->ONE_MORE_LINE, $lib_condition_paiement,0,'L');
+			$pdf->MultiCell($col_width, $this->ONE_MORE_LINE, $lib_condition_paiement,0,'L');
 
 			$posy = $pdf->GetY() + 6;
 		}
