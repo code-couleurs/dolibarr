@@ -301,6 +301,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				$curY = $tab_top + 7;
 				$nexY = $tab_top + 7;
 				$tab_header_height = 6;
+				$hasOptions = false;
 
 				// Loop on each lines
 				for ($i = 0 ; $i < $nblignes ; $i++)
@@ -351,6 +352,9 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 					$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 1);   // On repositionne la police par defaut
 
+					if (preg_match("/\(option\)/i", $object->lines[$i]->desc)) {
+						$hasOptions = true;
+					}
 
 					// Price without VAT before discount
 					if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT))
@@ -488,7 +492,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				}
 				
 				$pdf->startTransaction();
-				$posy = $this->_notes_post_tableau($pdf, $object, $bottomlasttab, $outputlangs);
+				$posy = $this->_notes_post_tableau($pdf, $object, $bottomlasttab, $outputlangs, $hasOptions);
 				
 				if ($posy > $bottom_max) {
 					// Pas de place en bas de la page, on réécrit en haut de la suivante.
@@ -501,7 +505,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 					if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) {
 						$this->_pagehead($pdf, $object, 0, $outputlangs, $hookmanager);
 					}
-					$posy = $this->_notes_post_tableau($pdf, $object, $this->FIRST_AFTER_HEADER, $outputlangs);
+					$posy = $this->_notes_post_tableau($pdf, $object, $this->FIRST_AFTER_HEADER, $outputlangs, $hasOptions);
 				}
 				else {
 					$pdf->commitTransaction();
@@ -600,14 +604,23 @@ class pdf_codecouleurs extends ModelePDFPropales
 		}
 		return $pdf->GetY();
 	}
-		
-	function _notes_post_tableau(&$pdf, $object, $posy, $outputlangs) {
+	
+	/**
+	 * Affichage des notes et des mentions client
+	 * @param PDF $pdf PDF à écrire.
+	 * @param Propal $object La propale
+	 * @param int $posy Ordonnée du document à partir de laquelle on commence
+	 * à écrire les notes.
+	 * @param Lang $outputlangs Gestion des langues
+	 * @return int L'ordonnée finale.
+	 */
+	function _notes_post_tableau(&$pdf, $object, $posy, $outputlangs, $hasOptions = false) {
 		// Affiche zone infos
 		$posy_gauche=$this->_tableau_info($pdf, $object, $posy, $outputlangs);
 		$posy_gauche=$this->_affichage_notes_et_mentions($pdf, $object, $posy_gauche, $outputlangs);
 
 		// Affiche zone totaux
-		$posy_droit=$this->_tableau_tot($pdf, $object, 0, $posy, $outputlangs);
+		$posy_droit=$this->_tableau_tot($pdf, $object, 0, $posy, $outputlangs, $hasOptions);
 		
 		return max($posy_gauche, $posy_droit);
 	}
@@ -720,7 +733,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 	 *	@param	Translate	$outputlangs	Objet langs
 	 *	@return int							Position pour suite
 	 */
-	function _tableau_tot(&$pdf, $object, $deja_regle, $posy, $outputlangs)
+	function _tableau_tot(&$pdf, $object, $deja_regle, $posy, $outputlangs, $hasOptions = false)
 	{
 		global $conf,$mysoc;
 		
@@ -917,6 +930,15 @@ class pdf_codecouleurs extends ModelePDFPropales
 			$pdf->MultiCell($largcol2, $text_height, price($object->total_ttc - $deja_regle), $useborder, 'R');
 
 			$pdf->SetTextColor($this->BLACK['r'],$this->BLACK['g'],$this->BLACK['b']);
+		}
+		
+		$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 3);
+
+		$cur_posy += $tab2_hl;
+		
+		if ($hasOptions) {
+			$pdf->SetXY($col1x, ++$cur_posy);
+			$pdf->MultiCell($col2x-$col1x, $text_height, $outputlangs->transnoentities('AllOptions'), $useborder, 'L');
 		}
 		
 		$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 1);
@@ -1255,7 +1277,10 @@ class pdf_codecouleurs extends ModelePDFPropales
 	}
 	
 	/**
-	 * Construire une adresse pour le header
+	 * Construire une adresse pour le header.
+	 * 
+	 * Cette méthode supplante la fonction Dolibarr du même nom étant donné que
+	 * cette dernière ne permet pas d'avoir le rendu souhaité..
 	 * @param type $outputlangs Gestionnaire de langues
 	 * @param type $company L'entreprise de l'adresse
 	 * @param mixed $contact Le contact
