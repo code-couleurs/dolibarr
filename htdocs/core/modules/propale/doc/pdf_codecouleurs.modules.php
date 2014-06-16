@@ -85,6 +85,11 @@ class pdf_codecouleurs extends ModelePDFPropales
 		'g' => 0xFF,
 		'b' => 0xFF
 	);
+	var $CC_RED = array(
+		'r' => 0xC8,
+		'g' => 0x0,
+		'b' => 0x0
+	);
 	
 	var $ONE_MORE_LINE = 5;
 	var $FIRST_AFTER_HEADER = 48;
@@ -247,6 +252,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 				$pdf->Open();
 				$pagenb=0;
 				$pdf->SetDrawColor($this->CC_DARK_GREY['r'],$this->CC_DARK_GREY['g'],$this->CC_DARK_GREY['b']);
+				$pdf->SetDisplayMode(100);
 
 				$pdf->SetTitle($outputlangs->convToOutputCharset($object->ref));
 				$pdf->SetSubject($outputlangs->transnoentities("CommercialProposal"));
@@ -764,7 +770,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 		$pdf->SetXY($col1x, $cur_posy + $marguin);
 		$pdf->MultiCell($col2x-$col1x, $text_height, $outputlangs->transnoentities("TotalHT"), 0, 'L');
 
-		$pdf->SetXY($col2x, $cur_posy + 0);
+		$pdf->SetXY($col2x, $cur_posy);
 		$pdf->MultiCell($largcol2, $tab2_hl, '', 0, 'R', 1);
 		$pdf->SetXY($col2x, $cur_posy + $marguin);
 		$pdf->MultiCell($largcol2, $text_height, price($object->total_ht + (! empty($object->remise)?$object->remise:0)), 0, 'R');
@@ -1090,7 +1096,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 
 		pdf_pagehead($pdf,$outputlangs,$this->page_hauteur);
 
-		//  Show Draft Watermark
+		// Show Draft Watermark
 		if($object->statut==0 && (! empty($conf->global->PROPALE_DRAFT_WATERMARK)) )
 		{
 			pdf_watermark($pdf,$outputlangs,$this->page_hauteur,$this->page_largeur,'mm',$conf->global->PROPALE_DRAFT_WATERMARK);
@@ -1115,7 +1121,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 			}
 			else
 			{
-				$pdf->SetTextColor(200,0,0);
+				$pdf->SetTextColor($this->CC_RED['r'],$this->CC_RED['g'],$this->CC_RED['b']);
 				$pdf->SetFont($ubuntu['bold']['normal'],'B',$default_font_size - 2);
 				$pdf->MultiCell(100, 3, $outputlangs->transnoentities("ErrorLogoFileNotFound",$logo), 0, 'L');
 				$pdf->MultiCell(100, 3, $outputlangs->transnoentities("ErrorGoToGlobalSetup"), 0, 'L');
@@ -1177,6 +1183,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 		{
 			$address_boxes_posy = $this->FIRST_AFTER_HEADER;
 			$retrait_cadre = 3;
+			
 			// Sender properties
 			
 			// Add internal contact of proposal if defined
@@ -1367,7 +1374,6 @@ class pdf_codecouleurs extends ModelePDFPropales
 		return self::pdf_pagefoot_codecouleurs($pdf,$outputlangs,'PROPALE_FREE_TEXT',$this->emetteur,$this->marge_basse,$this->marge_gauche,$this->page_hauteur,$object,0,$hidefreetext);
 	}
 
-
 	/**
 	 *  Show footer of page for PDF generation
 	 *
@@ -1527,7 +1533,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 		}
 
 		$marginwithfooter=$marge_basse + $freetextheight + 3*((!empty($line1)) + (!empty($line2)) + (!empty($line3)) + (!empty($line4)));
-		$posy=$marginwithfooter+0;
+		$posy=$marginwithfooter;
 
 		if ($line)	// Free text
 		{
@@ -1548,7 +1554,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 			$pdf->SetXY($dims['lm'],-$posy);
 			$pdf->MultiCell(200, 2, $line1, 0, 'C', 0);
 			$posy -= $this->ONE_MORE_LINE;
-			$pdf->SetFont('','',7);
+			$pdf->SetFont($ubuntu['bold']['normal'],'', $default_font_size);
 		}
 
 		if (!empty($line2))
@@ -1557,7 +1563,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 			$pdf->SetXY($dims['lm'],-$posy);
 			$pdf->MultiCell(200, 2, $line2, 0, 'C', 0);
 			$posy -= $this->ONE_MORE_LINE;
-			$pdf->SetFont('','',7);
+			$pdf->SetFont($ubuntu['bold']['normal'],'', $default_font_size);
 		}
 
 		if (!empty($line3))
