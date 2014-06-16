@@ -1801,6 +1801,11 @@ class pdf_codecouleurs extends ModelePDFFactures
 
 		// Line 3 of company infos
 		$line3=array();
+		// Nom de l'entreprise
+		if ($fromcompany->name)
+		{
+			$line3[] = $fromcompany->name;
+		}
 		// Juridical status
 		if ($fromcompany->forme_juridique_code)
 		{
