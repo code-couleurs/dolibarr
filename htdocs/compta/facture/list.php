@@ -72,7 +72,7 @@ $sortfield = GETPOST("sortfield",'alpha');
 $sortorder = GETPOST("sortorder",'alpha');
 $page = GETPOST("page",'int');
 if ($page == -1) {
-    $page = 0;
+	$page = 0;
 }
 $offset = $conf->liste_limit * $page;
 if (! $sortorder) $sortorder='DESC';
@@ -112,17 +112,17 @@ $reshook=$hookmanager->executeHooks('doActions',$parameters,$object,$action);   
 // Do we click on purge search criteria ?
 if (GETPOST("button_removefilter_x"))
 {
-    $search_categ='';
-    $search_user='';
-    $search_sale='';
-    $search_ref='';
-    $search_refcustomer='';
-    $search_societe='';
-    $search_montant_ht='';
-    $search_montant_ttc='';
-    $search_status='';
-    $year='';
-    $month='';
+	$search_categ='';
+	$search_user='';
+	$search_sale='';
+	$search_ref='';
+	$search_refcustomer='';
+	$search_societe='';
+	$search_montant_ht='';
+	$search_montant_ttc='';
+	$search_status='';
+	$year='';
+	$month='';
 }
 
 
@@ -153,8 +153,8 @@ else $sql.= ' LEFT JOIN '.MAIN_DB_PREFIX.'facturedet as fd ON fd.fk_facture = f.
 if ($search_sale > 0 || (! $user->rights->societe->client->voir && ! $socid)) $sql .= ", ".MAIN_DB_PREFIX."societe_commerciaux as sc";
 if ($search_user > 0)
 {
-    $sql.=", ".MAIN_DB_PREFIX."element_contact as ec";
-    $sql.=", ".MAIN_DB_PREFIX."c_type_contact as tc";
+	$sql.=", ".MAIN_DB_PREFIX."element_contact as ec";
+	$sql.=", ".MAIN_DB_PREFIX."c_type_contact as tc";
 }
 $sql.= ' WHERE f.fk_soc = s.rowid';
 $sql.= " AND f.entity = ".$conf->entity;
@@ -162,21 +162,21 @@ if (! $user->rights->societe->client->voir && ! $socid) $sql.= " AND s.rowid = s
 if ($socid) $sql.= ' AND s.rowid = '.$socid;
 if ($userid)
 {
-    if ($userid == -1) $sql.=' AND f.fk_user_author IS NULL';
-    else $sql.=' AND f.fk_user_author = '.$userid;
+	if ($userid == -1) $sql.=' AND f.fk_user_author IS NULL';
+	else $sql.=' AND f.fk_user_author = '.$userid;
 }
 if ($filtre)
 {
-    $aFilter = explode(',', $filtre);
-    foreach ($aFilter as $filter)
-    {
-        $filt = explode(':', $filter);
-        $sql .= ' AND ' . trim($filt[0]) . ' = ' . trim($filt[1]);
-    }
+	$aFilter = explode(',', $filtre);
+	foreach ($aFilter as $filter)
+	{
+		$filt = explode(':', $filter);
+		$sql .= ' AND ' . trim($filt[0]) . ' = ' . trim($filt[1]);
+	}
 }
 if ($search_ref)
 {
-    $sql .= natural_search('f.facnumber', $search_ref);
+	$sql .= natural_search('f.facnumber', $search_ref);
 }
 if ($search_refcustomer)
 {
@@ -184,15 +184,15 @@ if ($search_refcustomer)
 }
 if ($search_societe)
 {
-    $sql .= natural_search('s.nom', $search_societe);
+	$sql .= natural_search('s.nom', $search_societe);
 }
 if ($search_montant_ht)
 {
-    $sql.= ' AND f.total = \''.$db->escape(price2num(trim($search_montant_ht))).'\'';
+	$sql.= ' AND f.total = \''.$db->escape(price2num(trim($search_montant_ht))).'\'';
 }
 if ($search_montant_ttc)
 {
-    $sql.= ' AND f.total_ttc = \''.$db->escape(price2num(trim($search_montant_ttc))).'\'';
+	$sql.= ' AND f.total_ttc = \''.$db->escape(price2num(trim($search_montant_ttc))).'\'';
 }
 if ($search_status != '')
 {
@@ -200,173 +200,176 @@ if ($search_status != '')
 }
 if ($month > 0)
 {
-    if ($year > 0 && empty($day))
-    $sql.= " AND f.datef BETWEEN '".$db->idate(dol_get_first_day($year,$month,false))."' AND '".$db->idate(dol_get_last_day($year,$month,false))."'";
-    else if ($year > 0 && ! empty($day))
-    $sql.= " AND f.datef BETWEEN '".$db->idate(dol_mktime(0, 0, 0, $month, $day, $year))."' AND '".$db->idate(dol_mktime(23, 59, 59, $month, $day, $year))."'";
-    else
-    $sql.= " AND date_format(f.datef, '%m') = '".$month."'";
+	if ($year > 0 && empty($day))
+	$sql.= " AND f.datef BETWEEN '".$db->idate(dol_get_first_day($year,$month,false))."' AND '".$db->idate(dol_get_last_day($year,$month,false))."'";
+	else if ($year > 0 && ! empty($day))
+	$sql.= " AND f.datef BETWEEN '".$db->idate(dol_mktime(0, 0, 0, $month, $day, $year))."' AND '".$db->idate(dol_mktime(23, 59, 59, $month, $day, $year))."'";
+	else
+	$sql.= " AND date_format(f.datef, '%m') = '".$month."'";
 }
 else if ($year > 0)
 {
-    $sql.= " AND f.datef BETWEEN '".$db->idate(dol_get_first_day($year,1,false))."' AND '".$db->idate(dol_get_last_day($year,12,false))."'";
+	$sql.= " AND f.datef BETWEEN '".$db->idate(dol_get_first_day($year,1,false))."' AND '".$db->idate(dol_get_last_day($year,12,false))."'";
 }
 if ($search_sale > 0) $sql.= " AND s.rowid = sc.fk_soc AND sc.fk_user = " .$search_sale;
 if ($search_user > 0)
 {
-    $sql.= " AND ec.fk_c_type_contact = tc.rowid AND tc.element='facture' AND tc.source='internal' AND ec.element_id = f.rowid AND ec.fk_socpeople = ".$search_user;
+	$sql.= " AND ec.fk_c_type_contact = tc.rowid AND tc.element='facture' AND tc.source='internal' AND ec.element_id = f.rowid AND ec.fk_socpeople = ".$search_user;
 }
 if (! $sall)
 {
-    $sql.= ' GROUP BY f.rowid, f.facnumber, f.type, f.increment, f.total,f.tva, f.total_ttc,';
-    $sql.= ' f.datef, f.date_lim_reglement,';
-    $sql.= ' f.paye, f.fk_statut,';
-    $sql.= ' s.nom, s.rowid, f.note_private';
+	$sql.= ' GROUP BY f.rowid, f.facnumber, f.type, f.increment, f.total,f.tva, f.total_ttc,';
+	$sql.= ' f.datef, f.date_lim_reglement,';
+	$sql.= ' f.paye, f.fk_statut,';
+	$sql.= ' s.nom, s.rowid, f.note_private';
 }
 else
 {
-    $sql .= natural_search(array('s.nom', 'f.facnumber', 'f.note_public', 'fd.description'), $sall);
+	$sql .= natural_search(array('s.nom', 'f.facnumber', 'f.note_public', 'fd.description'), $sall);
 }
 $sql.= ' ORDER BY ';
 $listfield=explode(',',$sortfield);
 foreach ($listfield as $key => $value) $sql.= $listfield[$key].' '.$sortorder.',';
 $sql.= ' f.rowid DESC ';
+
+$sqlmax = $sql;	// Pour le nombre maxi de factures
+
 $sql.= $db->plimit($limit+1,$offset);
 //print $sql;
 
 $resql = $db->query($sql);
 if ($resql)
 {
-    $num = $db->num_rows($resql);
+	$num = $db->num_rows($resql);
 
-    if ($socid)
-    {
-        $soc = new Societe($db);
-        $soc->fetch($socid);
-    }
+	if ($socid)
+	{
+		$soc = new Societe($db);
+		$soc->fetch($socid);
+	}
 
-    $param='&socid='.$socid;
-    if ($month)              $param.='&month='.$month;
-    if ($year)               $param.='&year=' .$year;
-    if ($search_ref)         $param.='&search_ref=' .$search_ref;
-    if ($search_refcustomer) $param.='&search_refcustomer=' .$search_refcustomer;
-    if ($search_societe)     $param.='&search_societe=' .$search_societe;
-    if ($search_sale > 0)    $param.='&search_sale=' .$search_sale;
-    if ($search_user > 0)    $param.='&search_user=' .$search_user;
-    if ($search_montant_ht)  $param.='&search_montant_ht='.$search_montant_ht;
-    if ($search_montant_ttc) $param.='&search_montant_ttc='.$search_montant_ttc;
-    print_barre_liste($langs->trans('BillsCustomers').' '.($socid?' '.$soc->nom:''),$page,$_SERVER["PHP_SELF"],$param,$sortfield,$sortorder,'',$num);
+	$param='&socid='.$socid;
+	if ($month)              $param.='&month='.$month;
+	if ($year)               $param.='&year=' .$year;
+	if ($search_ref)         $param.='&search_ref=' .$search_ref;
+	if ($search_refcustomer) $param.='&search_refcustomer=' .$search_refcustomer;
+	if ($search_societe)     $param.='&search_societe=' .$search_societe;
+	if ($search_sale > 0)    $param.='&search_sale=' .$search_sale;
+	if ($search_user > 0)    $param.='&search_user=' .$search_user;
+	if ($search_montant_ht)  $param.='&search_montant_ht='.$search_montant_ht;
+	if ($search_montant_ttc) $param.='&search_montant_ttc='.$search_montant_ttc;
+	print_barre_liste($langs->trans('BillsCustomers').' '.($socid?' '.$soc->nom:''),$page,$_SERVER["PHP_SELF"],$param,$sortfield,$sortorder,'',$num);
 
-    $i = 0;
-    print '<form method="GET" action="'.$_SERVER["PHP_SELF"].'">'."\n";
-    print '<table class="liste" width="100%">';
+	$i = 0;
+	print '<form method="GET" action="'.$_SERVER["PHP_SELF"].'">'."\n";
+	print '<table class="liste" width="100%">';
 
- 	// If the user can view prospects other than his'
-    $moreforfilter='';
- 	if ($user->rights->societe->client->voir || $socid)
- 	{
- 		$langs->load("commercial");
- 		$moreforfilter.=$langs->trans('ThirdPartiesOfSaleRepresentative'). ': ';
+	// If the user can view prospects other than his'
+	$moreforfilter='';
+	if ($user->rights->societe->client->voir || $socid)
+	{
+		$langs->load("commercial");
+		$moreforfilter.=$langs->trans('ThirdPartiesOfSaleRepresentative'). ': ';
 		$moreforfilter.=$formother->select_salesrepresentatives($search_sale,'search_sale',$user);
-	 	$moreforfilter.=' &nbsp; &nbsp; &nbsp; ';
- 	}
-    // If the user can view prospects other than his'
-    if ($user->rights->societe->client->voir || $socid)
-    {
-        $moreforfilter.=$langs->trans('LinkedToSpecificUsers'). ': ';
-        $moreforfilter.=$form->select_dolusers($search_user,'search_user',1);
-    }
-    if ($moreforfilter)
-    {
-        print '<tr class="liste_titre">';
-        print '<td class="liste_titre" colspan="10">';
-        print $moreforfilter;
-        print '</td></tr>';
-    }
+		$moreforfilter.=' &nbsp; &nbsp; &nbsp; ';
+	}
+	// If the user can view prospects other than his'
+	if ($user->rights->societe->client->voir || $socid)
+	{
+		$moreforfilter.=$langs->trans('LinkedToSpecificUsers'). ': ';
+		$moreforfilter.=$form->select_dolusers($search_user,'search_user',1);
+	}
+	if ($moreforfilter)
+	{
+		print '<tr class="liste_titre">';
+		print '<td class="liste_titre" colspan="10">';
+		print $moreforfilter;
+		print '</td></tr>';
+	}
 
-    print '<tr class="liste_titre">';
-    print_liste_field_titre($langs->trans('Ref'),$_SERVER['PHP_SELF'],'f.facnumber','',$param,'',$sortfield,$sortorder);
+	print '<tr class="liste_titre">';
+	print_liste_field_titre($langs->trans('Ref'),$_SERVER['PHP_SELF'],'f.facnumber','',$param,'',$sortfield,$sortorder);
 	print_liste_field_titre($langs->trans('RefCustomer'),$_SERVER["PHP_SELF"],'f.ref_client','',$param,'',$sortfield,$sortorder);
-    print_liste_field_titre($langs->trans('Date'),$_SERVER['PHP_SELF'],'f.datef','',$param,'align="center"',$sortfield,$sortorder);
-    print_liste_field_titre($langs->trans("DateDue"),$_SERVER['PHP_SELF'],"f.date_lim_reglement",'',$param,'align="center"',$sortfield,$sortorder);
-    print_liste_field_titre($langs->trans('Company'),$_SERVER['PHP_SELF'],'s.nom','',$param,'',$sortfield,$sortorder);
-    print_liste_field_titre($langs->trans('AmountHT'),$_SERVER['PHP_SELF'],'f.total','',$param,'align="right"',$sortfield,$sortorder);
-    print_liste_field_titre($langs->trans('AmountVAT'),$_SERVER['PHP_SELF'],'f.tva','',$param,'align="right"',$sortfield,$sortorder);
-    print_liste_field_titre($langs->trans('AmountTTC'),$_SERVER['PHP_SELF'],'f.total_ttc','',$param,'align="right"',$sortfield,$sortorder);
-    print_liste_field_titre($langs->trans('Received'),$_SERVER['PHP_SELF'],'am','',$param,'align="right"',$sortfield,$sortorder);
-    print_liste_field_titre($langs->trans('Status'),$_SERVER['PHP_SELF'],'fk_statut,paye,am','',$param,'align="right"',$sortfield,$sortorder);
-    //print '<td class="liste_titre">&nbsp;</td>';
-    print '</tr>';
+	print_liste_field_titre($langs->trans('Date'),$_SERVER['PHP_SELF'],'f.datef','',$param,'align="center"',$sortfield,$sortorder);
+	print_liste_field_titre($langs->trans("DateDue"),$_SERVER['PHP_SELF'],"f.date_lim_reglement",'',$param,'align="center"',$sortfield,$sortorder);
+	print_liste_field_titre($langs->trans('Company'),$_SERVER['PHP_SELF'],'s.nom','',$param,'',$sortfield,$sortorder);
+	print_liste_field_titre($langs->trans('AmountHT'),$_SERVER['PHP_SELF'],'f.total','',$param,'align="right"',$sortfield,$sortorder);
+	print_liste_field_titre($langs->trans('AmountVAT'),$_SERVER['PHP_SELF'],'f.tva','',$param,'align="right"',$sortfield,$sortorder);
+	print_liste_field_titre($langs->trans('AmountTTC'),$_SERVER['PHP_SELF'],'f.total_ttc','',$param,'align="right"',$sortfield,$sortorder);
+	print_liste_field_titre($langs->trans('Received'),$_SERVER['PHP_SELF'],'am','',$param,'align="right"',$sortfield,$sortorder);
+	print_liste_field_titre($langs->trans('Status'),$_SERVER['PHP_SELF'],'fk_statut,paye,am','',$param,'align="right"',$sortfield,$sortorder);
+	//print '<td class="liste_titre">&nbsp;</td>';
+	print '</tr>';
 
-    // Filters lines
-    print '<tr class="liste_titre">';
-    print '<td class="liste_titre" align="left">';
-    print '<input class="flat" size="6" type="text" name="search_ref" value="'.$search_ref.'">';
-    print '</td>';
+	// Filters lines
+	print '<tr class="liste_titre">';
+	print '<td class="liste_titre" align="left">';
+	print '<input class="flat" size="6" type="text" name="search_ref" value="'.$search_ref.'">';
+	print '</td>';
 	print '<td class="liste_titre">';
 	print '<input class="flat" size="6" type="text" name="search_refcustomer" value="'.$search_refcustomer.'">';
 	print '</td>';
-    print '<td class="liste_titre" align="center">';
-    if (! empty($conf->global->MAIN_LIST_FILTER_ON_DAY)) print '<input class="flat" type="text" size="1" maxlength="2" name="day" value="'.$day.'">';
-    print '<input class="flat" type="text" size="1" maxlength="2" name="month" value="'.$month.'">';
-    $formother->select_year($year?$year:-1,'year',1, 20, 5);
-    print '</td>';
-    print '<td class="liste_titre" align="left">&nbsp;</td>';
-    print '<td class="liste_titre" align="left"><input class="flat" type="text" name="search_societe" value="'.$search_societe.'"></td>';
-    print '<td class="liste_titre" align="right"><input class="flat" type="text" size="10" name="search_montant_ht" value="'.$search_montant_ht.'"></td>';
-    print '<td class="liste_titre" align="right">&nbsp;</td>';
-    print '<td class="liste_titre" align="right"><input class="flat" type="text" size="10" name="search_montant_ttc" value="'.$search_montant_ttc.'"></td>';
-    print '<td class="liste_titre" align="right">&nbsp;</td>';
-    print '<td class="liste_titre" align="right"><input type="image" class="liste_titre" name="button_search" src="'.img_picto($langs->trans("Search"),'search.png','','',1).'" value="'.dol_escape_htmltag($langs->trans("Search")).'" title="'.dol_escape_htmltag($langs->trans("Search")).'">';
-    print "</td></tr>\n";
+	print '<td class="liste_titre" align="center">';
+	if (! empty($conf->global->MAIN_LIST_FILTER_ON_DAY)) print '<input class="flat" type="text" size="1" maxlength="2" name="day" value="'.$day.'">';
+	print '<input class="flat" type="text" size="1" maxlength="2" name="month" value="'.$month.'">';
+	$formother->select_year($year?$year:-1,'year',1, 20, 5);
+	print '</td>';
+	print '<td class="liste_titre" align="left">&nbsp;</td>';
+	print '<td class="liste_titre" align="left"><input class="flat" type="text" name="search_societe" value="'.$search_societe.'"></td>';
+	print '<td class="liste_titre" align="right"><input class="flat" type="text" size="10" name="search_montant_ht" value="'.$search_montant_ht.'"></td>';
+	print '<td class="liste_titre" align="right">&nbsp;</td>';
+	print '<td class="liste_titre" align="right"><input class="flat" type="text" size="10" name="search_montant_ttc" value="'.$search_montant_ttc.'"></td>';
+	print '<td class="liste_titre" align="right">&nbsp;</td>';
+	print '<td class="liste_titre" align="right"><input type="image" class="liste_titre" name="button_search" src="'.img_picto($langs->trans("Search"),'search.png','','',1).'" value="'.dol_escape_htmltag($langs->trans("Search")).'" title="'.dol_escape_htmltag($langs->trans("Search")).'">';
+	print "</td></tr>\n";
 
-    if ($num > 0)
-    {
-        $var=True;
-        $total_ht=0;
-        $total_tva=0;
-        $total_ttc=0;
-        $totalrecu=0;
+	if ($num > 0)
+	{
+		$var=True;
+		$total_ht=0;
+		$total_tva=0;
+		$total_ttc=0;
+		$totalrecu=0;
 
-        while ($i < min($num,$limit))
-        {
-            $objp = $db->fetch_object($resql);
-            $var=!$var;
+		while ($i < min($num,$limit))
+		{
+			$objp = $db->fetch_object($resql);
+			$var=!$var;
 
-            $datelimit=$db->jdate($objp->datelimite);
+			$datelimit=$db->jdate($objp->datelimite);
 
-            print '<tr '.$bc[$var].'>';
-            print '<td class="nowrap">';
+			print '<tr '.$bc[$var].'>';
+			print '<td class="nowrap">';
 
-            $facturestatic->id=$objp->facid;
-            $facturestatic->ref=$objp->facnumber;
-            $facturestatic->type=$objp->type;
-            $notetoshow=dol_string_nohtmltag(($user->societe_id>0?$objp->note_public:$objp->note),1);
-            $paiement = $facturestatic->getSommePaiement();
+			$facturestatic->id=$objp->facid;
+			$facturestatic->ref=$objp->facnumber;
+			$facturestatic->type=$objp->type;
+			$notetoshow=dol_string_nohtmltag(($user->societe_id>0?$objp->note_public:$objp->note),1);
+			$paiement = $facturestatic->getSommePaiement();
 
-            print '<table class="nobordernopadding"><tr class="nocellnopadd">';
+			print '<table class="nobordernopadding"><tr class="nocellnopadd">';
 
-            print '<td class="nobordernopadding nowrap">';
-            print $facturestatic->getNomUrl(1,'',200,0,$notetoshow);
-            print $objp->increment;
-            print '</td>';
+			print '<td class="nobordernopadding nowrap">';
+			print $facturestatic->getNomUrl(1,'',200,0,$notetoshow);
+			print $objp->increment;
+			print '</td>';
 
-            print '<td style="min-width: 20px" class="nobordernopadding nowrap">';
-            if (! empty($objp->note_private))
-            {
+			print '<td style="min-width: 20px" class="nobordernopadding nowrap">';
+			if (! empty($objp->note_private))
+			{
 				print ' <span class="note">';
 				print '<a href="'.DOL_URL_ROOT.'/compta/facture/note.php?id='.$objp->facid.'">'.img_picto($langs->trans("ViewPrivateNote"),'object_generic').'</a>';
 				print '</span>';
 			}
-            $filename=dol_sanitizeFileName($objp->facnumber);
-            $filedir=$conf->facture->dir_output . '/' . dol_sanitizeFileName($objp->facnumber);
-            $urlsource=$_SERVER['PHP_SELF'].'?id='.$objp->facid;
-            print $formfile->getDocumentsLink($facturestatic->element, $filename, $filedir);
+			$filename=dol_sanitizeFileName($objp->facnumber);
+			$filedir=$conf->facture->dir_output . '/' . dol_sanitizeFileName($objp->facnumber);
+			$urlsource=$_SERVER['PHP_SELF'].'?id='.$objp->facid;
+			print $formfile->getDocumentsLink($facturestatic->element, $filename, $filedir);
 			print '</td>';
-            print '</tr>';
-            print '</table>';
+			print '</tr>';
+			print '</table>';
 
-            print "</td>\n";
+			print "</td>\n";
 
 			// Customer ref
 			print '<td class="nowrap">';
@@ -374,71 +377,94 @@ if ($resql)
 			print '</td>';
 
 			// Date
-            print '<td align="center" class="nowrap">';
-            print dol_print_date($db->jdate($objp->df),'day');
-            print '</td>';
+			print '<td align="center" class="nowrap">';
+			print dol_print_date($db->jdate($objp->df),'day');
+			print '</td>';
 
-            // Date limit
-            print '<td align="center" class="nowrap">'.dol_print_date($datelimit,'day');
-            if ($datelimit < ($now - $conf->facture->client->warning_delay) && ! $objp->paye && $objp->fk_statut == 1 && ! $paiement)
-            {
-                print img_warning($langs->trans('Late'));
-            }
-            print '</td>';
+			// Date limit
+			print '<td align="center" class="nowrap">'.dol_print_date($datelimit,'day');
+			if ($datelimit < ($now - $conf->facture->client->warning_delay) && ! $objp->paye && $objp->fk_statut == 1 && ! $paiement)
+			{
+				print img_warning($langs->trans('Late'));
+			}
+			print '</td>';
 
-            print '<td>';
-            $thirdparty=new Societe($db);
-            $thirdparty->id=$objp->socid;
-            $thirdparty->nom=$objp->nom;
-            $thirdparty->client=$objp->client;
-            $thirdparty->code_client=$objp->code_client;
-            print $thirdparty->getNomUrl(1,'customer');
-            print '</td>';
+			print '<td>';
+			$thirdparty=new Societe($db);
+			$thirdparty->id=$objp->socid;
+			$thirdparty->nom=$objp->nom;
+			$thirdparty->client=$objp->client;
+			$thirdparty->code_client=$objp->code_client;
+			print $thirdparty->getNomUrl(1,'customer');
+			print '</td>';
 
-            print '<td align="right">'.price($objp->total_ht,0,$langs).'</td>';
+			print '<td align="right">'.price($objp->total_ht,0,$langs).'</td>';
 
-            print '<td align="right">'.price($objp->total_tva,0,$langs).'</td>';
+			print '<td align="right">'.price($objp->total_tva,0,$langs).'</td>';
 
-            print '<td align="right">'.price($objp->total_ttc,0,$langs).'</td>';
+			print '<td align="right">'.price($objp->total_ttc,0,$langs).'</td>';
 
-            print '<td align="right">'.(! empty($paiement)?price($paiement,0,$langs):'&nbsp;').'</td>';
+			print '<td align="right">'.(! empty($paiement)?price($paiement,0,$langs):'&nbsp;').'</td>';
 
-            // Affiche statut de la facture
-            print '<td align="right" class="nowrap">';
-            print $facturestatic->LibStatut($objp->paye,$objp->fk_statut,5,$paiement,$objp->type);
-            print "</td>";
-            //print "<td>&nbsp;</td>";
-            print "</tr>\n";
-            $total_ht+=$objp->total_ht;
-            $total_tva+=$objp->total_tva;
-            $total_ttc+=$objp->total_ttc;
-            $totalrecu+=$paiement;
-            $i++;
-        }
+			// Affiche statut de la facture
+			print '<td align="right" class="nowrap">';
+			print $facturestatic->LibStatut($objp->paye,$objp->fk_statut,5,$paiement,$objp->type);
+			print "</td>";
+			//print "<td>&nbsp;</td>";
+			print "</tr>\n";
+			$total_ht+=$objp->total_ht;
+			$total_tva+=$objp->total_tva;
+			$total_ttc+=$objp->total_ttc;
+			$totalrecu+=$paiement;
+			$i++;
+		}
 
-        if (($offset + $num) <= $limit)
-        {
-            // Print total
-            print '<tr class="liste_total">';
-            print '<td class="liste_total" colspan="5" align="left">'.$langs->trans('Total').'</td>';
-            print '<td class="liste_total" align="right">'.price($total_ht,0,$langs).'</td>';
-            print '<td class="liste_total" align="right">'.price($total_tva,0,$langs).'</td>';
-            print '<td class="liste_total" align="right">'.price($total_ttc,0,$langs).'</td>';
-            print '<td class="liste_total" align="right">'.price($totalrecu,0,$langs).'</td>';
-            print '<td class="liste_total" align="center">&nbsp;</td>';
-            print '</tr>';
-        }
-    }
+		// Nombre maxi de factures
+		if ($resmax = $db->query($sqlmax)) {
+			$max_factures = $db->num_rows($resmax);
+			
+			// On recalcule les totaux pour avoir les totaux de toutes les factures de toutes les pages
+			$total_ht=0;
+			$total_tva=0;
+			$total_ttc=0;
+			$totalrecu=0;
+			
+			// Gros total de fin de page
+			for ($j = 0; $j < $max_factures; $j++)
+			{
+				$objp = $db->fetch_object($resmax);
+				$facturestatic->id=$objp->facid;
+				$facturestatic->ref=$objp->facnumber;
+				$facturestatic->type=$objp->type;
+				$paiement = $facturestatic->getSommePaiement();
+				$total_ht+=$objp->total_ht;
+				$total_tva+=$objp->total_tva;
+				$total_ttc+=$objp->total_ttc;
+				$totalrecu+=$paiement;
+			}
+			
+			$db->free($resmax);
+		}
+		
+		// Print total
+		print '<tr class="liste_total">';
+		print '<td class="liste_total" colspan="5" align="left">'.$langs->trans('Total').'</td>';
+		print '<td class="liste_total" align="right">'.price($total_ht,0,$langs).'</td>';
+		print '<td class="liste_total" align="right">'.price($total_tva,0,$langs).'</td>';
+		print '<td class="liste_total" align="right">'.price($total_ttc,0,$langs).'</td>';
+		print '<td class="liste_total" align="right">'.price($totalrecu,0,$langs).'</td>';
+		print '<td class="liste_total" align="center">&nbsp;</td>';
+		print '</tr>';
+	}
 
-    print "</table>\n";
-    print "</form>\n";
-    $db->free($resql);
+	print "</table>\n";
+	print "</form>\n";
+	$db->free($resql);
 }
 else
 {
-    dol_print_error($db);
+	dol_print_error($db);
 }
 
 llxFooter();
 $db->close();
-?>
