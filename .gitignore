@@ -17,3 +17,4 @@ doxygen_warnings.log
 *.iml
 Thumbs.db
 
+/dploy.yaml
