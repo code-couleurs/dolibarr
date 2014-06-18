@@ -210,6 +210,7 @@ if ($search_user > 0)
 
 
 $sql.= ' ORDER BY '.$sortfield.' '.$sortorder.', p.ref DESC';
+$sqlmax = $sql;	// Pour le grand total
 $sql.= $db->plimit($limit + 1,$offset);
 $result=$db->query($sql);
 
@@ -314,7 +315,6 @@ if ($result)
 	print "</tr>\n";
 
 	$var=true;
-	$total=0;
 	$subtotal=0;
 
 	while ($i < min($num,$limit))
@@ -412,32 +412,29 @@ if ($result)
 
 		print "</tr>\n";
 
-		$total += $objp->total_ht;
 		$subtotal += $objp->total_ht;
 
 		$i++;
 	}
 
-	if ($total>0)
-			{
-				if($num<$limit){
-					$var=!$var;
-					print '<tr class="liste_total"><td align="left">'.$langs->trans("TotalHT").'</td>';
-					print '<td colspan="6" align="right"">'.price($total).'<td colspan="3"</td>';
-					print '</tr>';
-				}
-				else
-				{
-					$var=!$var;
-					print '<tr class="liste_total"><td align="left">'.$langs->trans("TotalHTforthispage").'</td>';
-					print '<td colspan="6" align="right"">'.price($total).'<td colspan="3"</td>';
-					print '</tr>';
-				}
-
-			}
-
+	// Total de toutes les propales
+	$total=0;
+	if ($resmax = $db->query($sqlmax)) {
+		for ($j = 0; $j < $db->num_rows($resmax); $j++)
+		{
+			$total += $db->fetch_object($resmax)->total_ht;
+		}
+		$db->free($resmax);
+	}
+	
+	print '<tr class="liste_total"><td align="left">'.$langs->trans("TotalHTforthispage").'</td>';
+	print '<td colspan="6" align="right"">'.price($subtotal).'<td colspan="3"</td>';
+	print '</tr>';
+	print '<tr class="liste_total"><td align="left">'.$langs->trans("TotalHT").'</td>';
+	print '<td colspan="6" align="right"">'.price($total).'<td colspan="3"</td>';
+	print '</tr>';
+	
 	print '</table>';
-
 	print '</form>';
 
 	$db->free($result);
