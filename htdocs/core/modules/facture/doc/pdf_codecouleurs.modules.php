@@ -1528,8 +1528,8 @@ class pdf_codecouleurs extends ModelePDFFactures
 				$contact_emetteur = null;
 			}
 
-			$carac_emetteur = $this->pdf_build_address($outputlangs, $this->emetteur, $contact_emetteur, 'internal');
-			//$carac_emetteur=pdf_build_address($outputlangs,$this->emetteur,$object->user,($usecontact?$object->user:''),$usecontact,'source');
+			//$carac_emetteur = $this->pdf_build_address($outputlangs, $this->emetteur, $contact_emetteur, 'internal');
+			$carac_emetteur=pdf_build_address($outputlangs,$this->emetteur,$object->user,($usecontact?$object->user:''),$usecontact,'source');
 
 			// Show sender
 			$posy=$address_boxes_posy;
