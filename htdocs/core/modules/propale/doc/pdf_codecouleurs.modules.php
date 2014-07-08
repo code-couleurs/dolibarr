@@ -366,7 +366,7 @@ class pdf_codecouleurs extends ModelePDFPropales
 					if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT))
 					{
 						$pdf->SetXY($this->posxup, $curY);
-						$up_excl_tax = (pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails, $hookmanager)*pdf_getlineqty($object,$i,$outputlangs,$hidedetails));
+						$up_excl_tax = floatval(str_replace(' ', '', pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails, $hookmanager))*pdf_getlineqty($object,$i,$outputlangs,$hidedetails));
 						$pdf->MultiCell($this->posxup-$this->posxtva-1, 3, price($up_excl_tax), 0, 'R');
 					}
 
