@@ -854,20 +854,20 @@ class pdf_codecouleurs extends ModelePDFFactures
 			$posy=$pdf->GetY()+4;
 		}
 
-		if ($object->client->pays_code == 'CH')
+		if ($object->client->country_code == 'CH')
 		{
-			$pdf->SetFont($ubuntu['bold']['normal'],'B', $default_font_size - 2);
+			$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 4);
 			$pdf->SetXY($this->marge_gauche, $posy);
-			$pdf->MultiCell(100, 3, $outputlangs->transnoentities("VATSuisse"), 0, 'L', 0);
+			$pdf->MultiCell(100, 3, 'Exonération de TVA en application de l\'article 2062 I du code général des impôts', 0, 'L', 0);
 
 			$posy=$pdf->GetY()+4;
 		}
-
-		if ($object->client->pays_code == 'BE')
+        
+        if (!empty($object->client->tva_intra) && !$object->client->tva_assuj)
 		{
-			$pdf->SetFont($ubuntu['bold']['normal'],'B', $default_font_size - 2);
+			$pdf->SetFont($ubuntu['light']['normal'],'', $default_font_size - 4);
 			$pdf->SetXY($this->marge_gauche, $posy);
-			$pdf->MultiCell(100, 3, $outputlangs->transnoentities("VATBelgique"), 0, 'L', 0);
+			$pdf->MultiCell(100, 3, 'TVA dûe par le preneur, article 283-2 du Code général des impôts', 0, 'L', 0);
 
 			$posy=$pdf->GetY()+4;
 		}
@@ -1632,11 +1632,13 @@ class pdf_codecouleurs extends ModelePDFFactures
 			global $langs;
 			$outputlangs = $langs;
 		}
-		
 		$adresse = array();
 		
 		// Adresse de la société
 		$adresse[] = $outputlangs->convToOutputCharset(dol_format_address($company));
+        if(!empty($company->tva_intra)) {
+            $adresse[] = 'Num. TVA : '.$company->tva_intra;
+        }
 		
 		// Coordonnées du contact
 		if (is_object($contact)) {
